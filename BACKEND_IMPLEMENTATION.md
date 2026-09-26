@@ -123,10 +123,32 @@ All errors must use this format:
 
 Before opening the pull request:
 
-1. Run backend tests, lint, and build checks.
+1. Run backend tests, lint, and build checks (`npm test`).
 2. Confirm every endpoint and event matches this document exactly.
 3. Document the backend start command and required environment variables.
 4. Rebase onto the latest `main`.
 5. Provide a seeded alert id and example requests for frontend integration.
+
+### Frontend Integration Information
+
+- **Start Command**: `npm run dev:server` (or `npm --workspace server run start`)
+- **Base URL**: `http://localhost:3000`
+- **Health Check**: `GET http://localhost:3000/health`
+- **Environment Variables**:
+  - `PORT`: Server port (default `3000`)
+  - `CLIENT_ORIGIN`: Allowed CORS origin (default `http://localhost:5173`)
+  - `NODE_ENV`: Environment mode (`development` / `test` / `production`)
+
+### Seeded Demo Alert
+
+- **Seeded Alert ID**: `ALR-001` (Cyclone Demo Scenario)
+- **API Endpoints**:
+  - `GET /api/alerts`: List alerts
+  - `GET /api/alerts/ALR-001`: Get single alert
+  - `POST /api/alerts/ALR-001/process`: Generate accessibility versions
+  - `POST /api/alerts/ALR-001/send`: Activate alert
+  - `POST /api/alerts/ALR-001/view`: Record citizen view
+  - `POST /api/alerts/ALR-001/acknowledge`: Record acknowledgement (idempotent)
+  - `GET /api/alerts/ALR-001/statistics`: Get delivery statistics
 
 Do not silently modify the alert contract. Raise contract changes in the pull request description first.
