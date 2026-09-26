@@ -1,12 +1,24 @@
-export class DemoProcessingService {
-  async processAlert(officialMessage, type, severity, affectedArea) {
+/**
+ * Base Alert Processor Interface
+ */
+export class AlertProcessor {
+  async process(_officialMessage, _type, _severity, _affectedArea) {
+    throw new Error("process() must be implemented by concrete subclass");
+  }
+}
+
+/**
+ * Deterministic Demo Alert Processor Implementation
+ */
+export class DemoAlertProcessor extends AlertProcessor {
+  async process(officialMessage, type, severity, affectedArea) {
     const upperType = (type || "EMERGENCY").toUpperCase();
     const area = affectedArea || "affected region";
 
     return {
       simplified: {
         title: `${upperType} WARNING`,
-        summary: `If you are in ${area}, move to a safe location immediately. ${officialMessage}`,
+        summary: `If you are in ${area}, move to a safe location immediately.`,
         actions: [
           `Evacuate low-lying areas in ${area}`,
           "Go to a designated safe shelter",
@@ -56,4 +68,32 @@ export class DemoProcessingService {
   }
 }
 
-export const processingService = new DemoProcessingService();
+/**
+ * Processing Service wrapping processor behind a pluggable service interface
+ */
+export class ProcessingService {
+  constructor(processor = new DemoAlertProcessor()) {
+    this.processor = processor;
+  }
+
+  setProcessor(processor) {
+    if (!(processor instanceof AlertProcessor)) {
+      throw new Error("Invalid processor: must extend AlertProcessor");
+    }
+    this.processor = processor;
+  }
+
+  async processAlert(officialMessage, type, severity, affectedArea) {
+    const originalOfficialMessage = String(officialMessage);
+    const result = await this.processor.process(originalOfficialMessage, type, severity, affectedArea);
+
+    return {
+      simplified: result.simplified,
+      translations: result.translations,
+      visualInstructions: result.visualInstructions,
+      preservedOfficialMessage: originalOfficialMessage,
+    };
+  }
+}
+
+export const processingService = new ProcessingService();

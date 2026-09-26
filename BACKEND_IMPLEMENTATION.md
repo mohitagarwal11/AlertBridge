@@ -96,10 +96,10 @@ All errors must use this format:
 
 ### 4. Processing service
 
-- [ ] Implement a deterministic demo processor for simplified text, translations, actions, and visual instructions.
-- [ ] Put processing behind a service interface so a real AI provider can replace the demo implementation later.
-- [ ] Store generated representations separately from the official message.
-- [ ] Add tests proving the official message is byte-for-byte unchanged.
+- [x] Implement a deterministic demo processor for simplified text, translations, actions, and visual instructions.
+- [x] Put processing behind a service interface so a real AI provider can replace the demo implementation later.
+- [x] Store generated representations separately from the official message.
+- [x] Add tests proving the official message is byte-for-byte unchanged.
 
 ### 5. Realtime delivery
 
