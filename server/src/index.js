@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { createApp } from "./app.js";
 import { config } from "./config.js";
 import { initializeDatabase } from "./db/index.js";
+import { socketService } from "./services/socketService.js";
 
 // Initialize DB and seed initial data
 initializeDatabase();
@@ -14,11 +15,8 @@ export const io = new Server(httpServer, {
   cors: { origin: config.clientOrigin },
 });
 
-io.on("connection", (socket) => {
-  socket.emit("alert:connected", {
-    message: "AlertBridge realtime channel ready",
-  });
-});
+// Initialize socket service event listeners
+socketService.init(io);
 
 if (process.env.NODE_ENV !== "test") {
   httpServer.listen(config.port, () => {
