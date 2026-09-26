@@ -1,55 +1,27 @@
-const demoAlert = {
-  id: "ALR-001",
-  type: "cyclone",
-  severity: "critical",
-  affectedArea: "Coastal Odisha",
-  officialMessage:
-    "Due to the severe cyclonic storm expected to make landfall, residents in low-lying coastal areas are advised to evacuate to designated shelters.",
-  simplified: {
-    title: "CYCLONE APPROACHING",
-    summary: "Move to a safe location immediately.",
-    actions: [
-      "Leave low-lying areas",
-      "Go to a safe shelter",
-      "Stay away from the sea",
-    ],
-  },
-};
+import { Suspense } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
+import { LoadingState } from "./components/ui/PageStates";
+import AuthorityPage from "./pages/AuthorityPage";
+import CitizenPage from "./pages/CitizenPage";
+import LandingPage from "./pages/LandingPage";
 
 export default function App() {
   return (
-    <main className="app-shell">
-      <header className="topbar">
-        <p className="eyebrow">AlertBridge prototype</p>
-        <span className="status">Demo alert</span>
-      </header>
-
-      <section className="alert-panel" aria-labelledby="alert-title">
-        <div className="alert-heading">
-          <div>
-            <p className="severity">Critical warning</p>
-            <h1 id="alert-title">{demoAlert.simplified.title}</h1>
-            <p className="location">{demoAlert.affectedArea}</p>
-          </div>
-          <span className="alert-id">{demoAlert.id}</span>
-        </div>
-
-        <p className="summary">{demoAlert.simplified.summary}</p>
-        <ul className="actions">
-          {demoAlert.simplified.actions.map((action) => (
-            <li key={action}>{action}</li>
-          ))}
-        </ul>
-
-        <button type="button" className="acknowledge-button">
-          I understand this alert
-        </button>
-      </section>
-
-      <details className="official-message">
-        <summary>View official message</summary>
-        <p>{demoAlert.officialMessage}</p>
-      </details>
-    </main>
+    <BrowserRouter>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingState />}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route index element={<LandingPage />} />
+              <Route path="citizen" element={<CitizenPage />} />
+              <Route path="authority" element={<AuthorityPage />} />
+              <Route path="*" element={<Navigate replace to="/" />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }

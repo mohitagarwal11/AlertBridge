@@ -72,11 +72,11 @@ alert:acknowledged
 
 ### 1. Application foundation
 
-- [ ] Set up the React/Vite application.
-- [ ] Add routing for authority and citizen areas.
-- [ ] Add shared layout, navigation, loading states, and error states.
-- [ ] Add an API client with a configurable backend URL.
-- [ ] Add mock data using the shared alert shape.
+- [x] Set up the React/Vite application.
+- [x] Add routing for authority and citizen areas.
+- [x] Add shared layout, navigation, loading states, and error states.
+- [x] Add an API client with a configurable backend URL.
+- [x] Add mock data using the shared alert shape.
 
 ### 2. Citizen workflow
 
