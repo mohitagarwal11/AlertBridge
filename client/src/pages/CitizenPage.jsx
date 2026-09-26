@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import ConnectionStatus from "../components/ui/ConnectionStatus";
 import { demoAlert } from "../data/demoAlerts";
+import { useAlertSocket } from "../hooks/useAlertSocket";
 
 const languageOptions = [
   { code: "en", label: "English", speech: "en-IN" },
@@ -17,6 +19,7 @@ function formatExpiry(date) {
 }
 
 export default function CitizenPage() {
+  const [activeAlert, setActiveAlert] = useState(demoAlert);
   const [language, setLanguage] = useState("en");
   const [isLargeText, setIsLargeText] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
@@ -25,10 +28,27 @@ export default function CitizenPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [acknowledgement, setAcknowledgement] = useState("available");
   const [history, setHistory] = useState([]);
-  const copy = demoAlert.translations[language] || demoAlert.translations.en;
+  const copy =
+    activeAlert.translations[language] || activeAlert.translations.en;
   const selectedLanguage = languageOptions.find(
     (item) => item.code === language,
   );
+  const connectionState = useAlertSocket({
+    "alert:received": (payload) => {
+      const incomingAlert = payload?.alert || payload;
+      if (incomingAlert?.id) {
+        setActiveAlert(incomingAlert);
+        setAcknowledgement("available");
+      }
+    },
+    "alert:sent": (payload) => {
+      const incomingAlert = payload?.alert || payload;
+      if (incomingAlert?.id) {
+        setActiveAlert(incomingAlert);
+        setAcknowledgement("available");
+      }
+    },
+  });
 
   useEffect(() => {
     try {
@@ -72,8 +92,8 @@ export default function CitizenPage() {
     window.setTimeout(() => {
       const acknowledgedAt = new Date().toISOString();
       const nextHistory = [
-        { alertId: demoAlert.id, title: copy.title, acknowledgedAt },
-        ...history.filter((item) => item.alertId !== demoAlert.id),
+        { alertId: activeAlert.id, title: copy.title, acknowledgedAt },
+        ...history.filter((item) => item.alertId !== activeAlert.id),
       ];
       try {
         localStorage.setItem(historyKey, JSON.stringify(nextHistory));
@@ -98,7 +118,10 @@ export default function CitizenPage() {
   return (
     <main className={pageClasses}>
       <div className="page-intro">
-        <span className="section-kicker">Citizen view</span>
+        <div className="page-heading-row">
+          <span className="section-kicker">Citizen view</span>
+          <ConnectionStatus state={connectionState} />
+        </div>
         <h1>Active alerts</h1>
         <p>
           One clear place to see what is happening and what action is expected.
@@ -161,11 +184,11 @@ export default function CitizenPage() {
         aria-labelledby="alert-title"
       >
         <div className="alert-preview-meta">
-          <span className="severity">{demoAlert.severity} warning</span>
-          <span>{demoAlert.id}</span>
+          <span className="severity">{activeAlert.severity} warning</span>
+          <span>{activeAlert.id}</span>
         </div>
         <h2 id="alert-title">{copy.title}</h2>
-        <p className="location">{demoAlert.affectedArea}</p>
+        <p className="location">{activeAlert.affectedArea}</p>
         <p className="summary">{copy.summary}</p>
         <ul className="actions">
           {copy.actions.map((action) => (
@@ -175,7 +198,7 @@ export default function CitizenPage() {
 
         <div className="visual-instructions" aria-label="Visual instructions">
           <span className="section-kicker">Remember</span>
-          {demoAlert.visualInstructions.map((instruction) => (
+          {activeAlert.visualInstructions.map((instruction) => (
             <div className="visual-instruction" key={instruction.icon}>
               <span aria-hidden="true" className="visual-icon">
                 {instruction.icon === "evacuate" ? "!" : "+"}
@@ -184,7 +207,7 @@ export default function CitizenPage() {
                 {language === "en"
                   ? instruction.text
                   : copy.actions[
-                      demoAlert.visualInstructions.indexOf(instruction)
+                      activeAlert.visualInstructions.indexOf(instruction)
                     ]}
               </span>
             </div>
@@ -192,7 +215,7 @@ export default function CitizenPage() {
         </div>
 
         <p className="expiry">
-          Alert valid until {formatExpiry(demoAlert.expiresAt)}
+          Alert valid until {formatExpiry(activeAlert.expiresAt)}
         </p>
 
         <div className="alert-controls">
@@ -223,7 +246,7 @@ export default function CitizenPage() {
 
         <details className="official-message">
           <summary>{copy.officialLabel}</summary>
-          <p>{demoAlert.officialMessage}</p>
+          <p>{activeAlert.officialMessage}</p>
         </details>
       </article>
 
