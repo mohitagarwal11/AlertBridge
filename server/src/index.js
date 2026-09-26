@@ -1,23 +1,17 @@
-import cors from "cors";
-import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
+import { createApp } from "./app.js";
+import { config } from "./config.js";
+import { initializeDatabase } from "./db/index.js";
 
-const port = Number(process.env.PORT || 3000);
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-const app = express();
+// Initialize DB and seed initial data
+initializeDatabase();
+
+const app = createApp();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: { origin: clientOrigin } });
 
-app.use(cors({ origin: clientOrigin }));
-app.use(express.json());
-
-app.get("/health", (_request, response) => {
-  response.json({ status: "ok", service: "alertbridge-server" });
-});
-
-app.get("/api/alerts", (_request, response) => {
-  response.json({ data: [] });
+export const io = new Server(httpServer, {
+  cors: { origin: config.clientOrigin },
 });
 
 io.on("connection", (socket) => {
@@ -26,6 +20,10 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(port, () => {
-  console.log(`AlertBridge server listening on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  httpServer.listen(config.port, () => {
+    console.log(`AlertBridge server listening on http://localhost:${config.port}`);
+  });
+}
+
+export { app, httpServer };

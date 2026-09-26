@@ -72,19 +72,19 @@ All errors must use this format:
 
 ### 1. Service foundation
 
-- [ ] Set up Node.js, Express, Socket.IO, and environment configuration.
-- [ ] Add health endpoint and centralized error middleware.
-- [ ] Add request validation and CORS configuration.
-- [ ] Add database connection and migration/seed strategy.
-- [ ] Add cyclone demo seed data.
+- [x] Set up Node.js, Express, Socket.IO, and environment configuration.
+- [x] Add health endpoint and centralized error middleware.
+- [x] Add request validation and CORS configuration.
+- [x] Add database connection and migration/seed strategy.
+- [x] Add cyclone demo seed data.
 
 ### 2. Data model
 
-- [ ] Define alert persistence with original message, generated content, status, and timestamps.
-- [ ] Define translations and visual instructions.
-- [ ] Define recipient delivery, viewed, and acknowledgement timestamps.
-- [ ] Add indexes for alert status, creation time, and recipient lookup.
-- [ ] Ensure generated data cannot replace `officialMessage`.
+- [x] Define alert persistence with original message, generated content, status, and timestamps.
+- [x] Define translations and visual instructions.
+- [x] Define recipient delivery, viewed, and acknowledgement timestamps.
+- [x] Add indexes for alert status, creation time, and recipient lookup.
+- [x] Ensure generated data cannot replace `officialMessage`.
 
 ### 3. Alert lifecycle API
 
