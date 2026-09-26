@@ -154,3 +154,281 @@ h1 {
     margin-top: 1rem;
   }
 }
+
+.site-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(217, 226, 214, 0.55), transparent 35%), #f1eee7;
+}
+
+.site-header,
+.site-footer,
+.landing-page,
+.page-container {
+  width: min(100% - 2rem, 68rem);
+  margin: 0 auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.25rem 0;
+}
+
+.brand {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.brand > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.brand strong {
+  font-size: 1.1rem;
+}
+
+.brand small {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #1f5a46;
+  color: #fffdf8;
+  display: flex;
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  height: 2.2rem;
+  justify-content: center;
+  width: 2.2rem;
+}
+
+.primary-nav {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.nav-link {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  padding: 0.6rem 0.8rem;
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #1f5a46;
+  text-decoration: underline;
+  text-underline-offset: 0.35rem;
+}
+
+.landing-page {
+  align-items: end;
+  display: grid;
+  gap: 4rem;
+  grid-template-columns: minmax(0, 1.3fr) minmax(13rem, 0.7fr);
+  min-height: calc(100vh - 10rem);
+  padding: 5rem 0;
+}
+
+.section-kicker,
+.state-kicker {
+  color: #ba321f;
+  font-family: Arial, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-copy h1,
+.page-intro h1 {
+  font-size: clamp(2.8rem, 7vw, 6.8rem);
+  line-height: 0.92;
+  margin: 1.2rem 0;
+  max-width: 8ch;
+}
+
+.landing-copy > p,
+.page-intro > p {
+  color: #54645c;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  max-width: 32rem;
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.primary-action,
+.secondary-action {
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.9rem 1rem;
+  text-decoration: none;
+}
+
+.primary-action {
+  background: #1f5a46;
+  color: #fffdf8;
+}
+
+.secondary-action {
+  border: 1px solid #aebdb1;
+  color: #1f5a46;
+}
+
+.landing-note,
+.empty-panel {
+  border-left: 0.3rem solid #d49b2d;
+  background: rgba(255, 253, 248, 0.65);
+  padding: 1.4rem;
+}
+
+.landing-note span,
+.landing-note strong {
+  display: block;
+  font-family: Arial, sans-serif;
+}
+
+.landing-note span {
+  color: #ba321f;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-note strong {
+  font-size: 1.35rem;
+  margin-top: 1rem;
+}
+
+.landing-note p,
+.empty-panel p {
+  color: #54645c;
+  line-height: 1.5;
+}
+
+.page-container {
+  padding: 5rem 0;
+}
+
+.page-intro {
+  margin-bottom: 3rem;
+}
+
+.page-intro h1 {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+}
+
+.alert-preview {
+  background: #fffdf8;
+  border-top: 0.45rem solid #ba321f;
+  box-shadow: 0 1rem 3rem rgba(35, 48, 42, 0.1);
+  max-width: 50rem;
+  padding: clamp(1.5rem, 6vw, 3rem);
+}
+
+.alert-preview-meta {
+  color: #78847d;
+  display: flex;
+  font-family: Arial, sans-serif;
+  font-size: 0.7rem;
+  justify-content: space-between;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.alert-preview h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.95;
+  margin: 2rem 0 0.7rem;
+  max-width: 10ch;
+}
+
+.empty-panel {
+  max-width: 40rem;
+}
+
+.empty-panel h2 {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1;
+  margin: 1rem 0;
+}
+
+.page-state {
+  margin: 0 auto;
+  max-width: 68rem;
+  padding: 8rem 1rem;
+}
+
+.page-state h1 {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 0.95;
+  margin: 1rem 0;
+  max-width: 8ch;
+}
+
+.page-state-error h1 {
+  color: #ba321f;
+}
+
+.page-state p {
+  color: #54645c;
+  font-size: 1.1rem;
+}
+
+.site-footer {
+  border-top: 1px solid #c6cfc8;
+  color: #78847d;
+  display: flex;
+  font-family: Arial, sans-serif;
+  font-size: 0.68rem;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  padding: 1rem 0 2rem;
+  text-transform: uppercase;
+}
+
+@media (max-width: 680px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .landing-page {
+    display: block;
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  .landing-note {
+    margin-top: 3rem;
+  }
+
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
