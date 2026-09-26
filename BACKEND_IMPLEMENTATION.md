@@ -103,21 +103,21 @@ All errors must use this format:
 
 ### 5. Realtime delivery
 
-- [ ] Emit `alert:sent` after a successful send.
-- [ ] Emit `alert:received` for the citizen delivery simulation.
-- [ ] Emit `alert:viewed` and `alert:acknowledged` after successful state changes.
-- [ ] Include alert id and relevant status/statistics data in event payloads.
-- [ ] Handle disconnected clients without corrupting persistence state.
+- [x] Emit `alert:sent` after a successful send.
+- [x] Emit `alert:received` for the citizen delivery simulation.
+- [x] Emit `alert:viewed` and `alert:acknowledged` after successful state changes.
+- [x] Include alert id and relevant status/statistics data in event payloads.
+- [x] Handle disconnected clients without corrupting persistence state.
 
 ## Backend Acceptance Criteria
 
-- [ ] API tests cover validation, all lifecycle endpoints, status transitions, and predictable errors.
-- [ ] Repeated acknowledgement requests do not create duplicate state or inflate statistics.
-- [ ] Statistics correctly report sent, delivered, viewed, and acknowledged totals.
-- [ ] Socket events are emitted only after the corresponding state is persisted.
-- [ ] Seeded data supports the complete authority-to-citizen demo.
-- [ ] Secrets and database credentials come only from environment variables.
-- [ ] No backend task requires a change to frontend implementation files.
+- [x] API tests cover validation, all lifecycle endpoints, status transitions, and predictable errors.
+- [x] Repeated acknowledgement requests do not create duplicate state or inflate statistics.
+- [x] Statistics correctly report sent, delivered, viewed, and acknowledged totals.
+- [x] Socket events are emitted only after the corresponding state is persisted.
+- [x] Seeded data supports the complete authority-to-citizen demo.
+- [x] Secrets and database credentials come only from environment variables.
+- [x] No backend task requires a change to frontend implementation files.
 
 ## Handoff To Integration
 
