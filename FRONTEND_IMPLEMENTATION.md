@@ -105,6 +105,16 @@ alert:acknowledged
 - [x] Update authority statistics when `alert:viewed` or `alert:acknowledged` arrives.
 - [x] Reconnect cleanly and show a non-blocking connection state.
 
+### 5. Frontend hardening
+
+- [x] Add a jsdom/Vitest test setup for React workflows.
+- [x] Test alert rendering and official message preservation.
+- [x] Test language switching and document language updates.
+- [x] Test browser text-to-speech start and stop controls.
+- [x] Test acknowledgement persistence and duplicate prevention.
+- [x] Test accessibility setting state changes.
+- [x] Verify the production build after hardening changes.
+
 ## Frontend Acceptance Criteria
 
 - [x] All primary screens work with mock data before backend integration.
@@ -112,7 +122,7 @@ alert:acknowledged
 - [x] Official text cannot be overwritten by generated content in the UI.
 - [x] The acknowledgement action is idempotent from the user's perspective.
 - [x] The interface works on mobile width and with accessibility settings enabled.
-- [ ] Tests cover alert rendering, language switching, text-to-speech controls, and acknowledgement behavior.
+- [x] Tests cover alert rendering, language switching, text-to-speech controls, and acknowledgement behavior.
 - [x] No frontend task requires a change to backend implementation files.
 
 ## Handoff To Integration
