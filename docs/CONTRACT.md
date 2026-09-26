@@ -51,17 +51,17 @@ Repeated acknowledgement is idempotent. Backward transitions are rejected.
 
 Base URL: `http://localhost:3000`
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/health` | Service health |
-| `POST` | `/api/alerts` | Create a draft alert |
-| `GET` | `/api/alerts` | List alerts; optional `?status=` filter |
-| `GET` | `/api/alerts/:id` | Get one alert |
-| `POST` | `/api/alerts/:id/process` | Generate accessible representations |
-| `POST` | `/api/alerts/:id/send` | Activate and broadcast an alert |
-| `POST` | `/api/alerts/:id/view` | Record a recipient view |
-| `POST` | `/api/alerts/:id/acknowledge` | Record a recipient acknowledgement |
-| `GET` | `/api/alerts/:id/statistics` | Get recipient statistics |
+| Method | Endpoint                      | Purpose                                 |
+| ------ | ----------------------------- | --------------------------------------- |
+| `GET`  | `/health`                     | Service health                          |
+| `POST` | `/api/alerts`                 | Create a draft alert                    |
+| `GET`  | `/api/alerts`                 | List alerts; optional `?status=` filter |
+| `GET`  | `/api/alerts/:id`             | Get one alert                           |
+| `POST` | `/api/alerts/:id/process`     | Generate accessible representations     |
+| `POST` | `/api/alerts/:id/send`        | Activate and broadcast an alert         |
+| `POST` | `/api/alerts/:id/view`        | Record a recipient view                 |
+| `POST` | `/api/alerts/:id/acknowledge` | Record a recipient acknowledgement      |
+| `GET`  | `/api/alerts/:id/statistics`  | Get recipient statistics                |
 
 The statistics response currently uses this shape:
 
@@ -91,14 +91,14 @@ API errors use:
 
 The server emits these events after persistence succeeds:
 
-| Event | Payload purpose |
-|---|---|
-| `alert:connected` | Realtime connection confirmation |
-| `alert:sent` | Sent alert payload with `alertId` and `alert` |
-| `alert:received` | Delivery simulation payload with `alertId` and `alert` |
-| `alert:viewed` | `alertId`, recipient record, and `statistics` |
-| `alert:acknowledged` | `alertId`, recipient record, and `statistics` |
-| `alert:error` | Socket acknowledgement error |
+| Event                | Payload purpose                                        |
+| -------------------- | ------------------------------------------------------ |
+| `alert:connected`    | Realtime connection confirmation                       |
+| `alert:sent`         | Sent alert payload with `alertId` and `alert`          |
+| `alert:received`     | Delivery simulation payload with `alertId` and `alert` |
+| `alert:viewed`       | `alertId`, recipient record, and `statistics`          |
+| `alert:acknowledged` | `alertId`, recipient record, and `statistics`          |
+| `alert:error`        | Socket acknowledgement error                           |
 
 The client may emit:
 
