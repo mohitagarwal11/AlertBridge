@@ -88,11 +88,11 @@ All errors must use this format:
 
 ### 3. Alert lifecycle API
 
-- [ ] Implement create, list, detail, process, send, view, acknowledge, and statistics endpoints.
-- [ ] Validate required fields and reject malformed alert data with the shared error format.
-- [ ] Enforce `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED` transitions.
-- [ ] Make acknowledgement idempotent.
-- [ ] Return the shared alert shape from detail and lifecycle responses.
+- [x] Implement create, list, detail, process, send, view, acknowledge, and statistics endpoints.
+- [x] Validate required fields and reject malformed alert data with the shared error format.
+- [x] Enforce `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED` transitions.
+- [x] Make acknowledgement idempotent.
+- [x] Return the shared alert shape from detail and lifecycle responses.
 
 ### 4. Processing service
 

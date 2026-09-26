@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { config } from "./config.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import alertRoutes from "./routes/alertRoutes.js";
 
 export function createApp(configureRoutes) {
   const app = express();
@@ -17,11 +18,13 @@ export function createApp(configureRoutes) {
     });
   });
 
+  app.use("/api/alerts", alertRoutes);
+
   if (typeof configureRoutes === "function") {
     configureRoutes(app);
   }
 
-  // Centralized error middleware attached AFTER routes
+  // Centralized error middleware attached AFTER all routes
   app.use(errorHandler);
 
   return app;
