@@ -100,10 +100,10 @@ alert:acknowledged
 
 ### 4. Realtime behavior
 
-- [ ] Add a Socket.IO client service.
-- [ ] Update citizen views when `alert:received` or `alert:sent` arrives.
-- [ ] Update authority statistics when `alert:viewed` or `alert:acknowledged` arrives.
-- [ ] Reconnect cleanly and show a non-blocking connection state.
+- [x] Add a Socket.IO client service.
+- [x] Update citizen views when `alert:received` or `alert:sent` arrives.
+- [x] Update authority statistics when `alert:viewed` or `alert:acknowledged` arrives.
+- [x] Reconnect cleanly and show a non-blocking connection state.
 
 ## Frontend Acceptance Criteria
 

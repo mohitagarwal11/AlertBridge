@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import ConnectionStatus from "../components/ui/ConnectionStatus";
 import { demoAlert, demoAlerts } from "../data/demoAlerts";
+import { useAlertSocket } from "../hooks/useAlertSocket";
 
 const initialForm = {
   officialMessage: demoAlert.officialMessage,
@@ -55,6 +57,26 @@ export default function AuthorityPage() {
   const [sendState, setSendState] = useState("idle");
   const [statistics, setStatistics] = useState(initialStatistics);
   const [history, setHistory] = useState(demoAlerts);
+
+  const connectionState = useAlertSocket({
+    "alert:sent": () => setAlertStatus("sent"),
+    "alert:viewed": (payload) => {
+      const incomingStatistics = payload?.statistics || payload;
+      setStatistics((current) =>
+        typeof incomingStatistics?.viewed === "number"
+          ? { ...current, ...incomingStatistics }
+          : { ...current, viewed: current.viewed + 1 },
+      );
+    },
+    "alert:acknowledged": (payload) => {
+      const incomingStatistics = payload?.statistics || payload;
+      setStatistics((current) =>
+        typeof incomingStatistics?.acknowledged === "number"
+          ? { ...current, ...incomingStatistics }
+          : { ...current, acknowledged: current.acknowledged + 1 },
+      );
+    },
+  });
 
   const acknowledgementRate = useMemo(
     () =>
@@ -121,7 +143,10 @@ export default function AuthorityPage() {
   return (
     <main className="authority-page page-container">
       <div className="page-intro authority-intro">
-        <span className="section-kicker">Authority view</span>
+        <div className="page-heading-row">
+          <span className="section-kicker">Authority view</span>
+          <ConnectionStatus state={connectionState} />
+        </div>
         <h1>Alert operations</h1>
         <p>
           Create, review, send, and monitor emergency warnings from one
