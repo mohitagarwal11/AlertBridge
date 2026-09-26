@@ -931,3 +931,239 @@ The long-term goal is to provide an interoperable accessibility layer that can s
 Built with React and a modular backend architecture designed for future integration with low-bandwidth and offline delivery systems.
 
 ---
+
+# Parallel Implementation Plan
+
+This plan is designed for two people to work simultaneously in separate branches. The work is divided by ownership boundary so that both branches can be developed and tested independently before integration.
+
+## Implementation Handoff Files
+
+Use these files as the direct task lists for each branch:
+
+- [Frontend implementation guide](FRONTEND_IMPLEMENTATION.md) — Person A, branch `feature/frontend-citizen-authority`
+- [Backend implementation guide](BACKEND_IMPLEMENTATION.md) — Person B, branch `feature/backend-alert-platform`
+
+The **Common Rules** and **Shared Contract** sections in both files are mandatory for both people. They intentionally repeat the same alert shape, endpoints, events, status transitions, and error format so either person can work independently without depending on an unmerged branch. Any change to common behavior must be discussed and updated in both files before implementation continues.
+
+## Working Agreement
+
+- `main` contains only integrated, working code.
+- Both branches start from the same baseline commit.
+- Each person owns their branch's directories and does not edit the other person's implementation files.
+- Shared behavior is agreed through the contracts below before implementation.
+- Use small, focused commits. Do not mix formatting, dependency upgrades, or unrelated refactors into feature commits.
+- Open a pull request only after the branch's local checks pass.
+
+## Branch Ownership
+
+| Branch                               | Owner    | Primary responsibility                                                     | Main directories                                 |
+| ------------------------------------ | -------- | -------------------------------------------------------------------------- | ------------------------------------------------ |
+| `feature/frontend-citizen-authority` | Person A | React user experience for authority and citizen workflows                  | `client/`, `src/`, frontend tests                |
+| `feature/backend-alert-platform`     | Person B | API, persistence, alert processing, acknowledgement, and realtime delivery | `server/`, `api/`, database files, backend tests |
+
+If the repository has not been scaffolded yet, Person A owns the frontend scaffold and Person B owns the backend scaffold. Keep them as separate `client` and `server` applications so the branches remain mergeable.
+
+## Shared Contract
+
+Both branches should use this alert shape. Person B implements it; Person A uses mock data with the same shape until the API is available.
+
+```javascript
+{
+  id: "ALR-001",
+  type: "cyclone",
+  severity: "critical",
+  affectedArea: "Coastal Odisha",
+  officialMessage: "Original authority message",
+  simplified: {
+    title: "CYCLONE APPROACHING",
+    summary: "Move to a safe location immediately.",
+    actions: ["Leave low-lying areas", "Go to a safe shelter"]
+  },
+  translations: { en: {}, hi: {}, or: {} },
+  visualInstructions: [{ icon: "shelter", text: "Go to a safe shelter" }],
+  status: "active",
+  createdAt: "2026-01-01T12:00:00.000Z",
+  expiresAt: "2026-01-02T12:00:00.000Z"
+}
+```
+
+The following endpoints and events are the integration boundary:
+
+```text
+POST /api/alerts                 Create a draft alert
+GET  /api/alerts                 List alerts
+GET  /api/alerts/:id             Get one alert
+POST /api/alerts/:id/process     Generate accessible representations
+POST /api/alerts/:id/send        Send an alert
+POST /api/alerts/:id/view        Record that a citizen viewed it
+POST /api/alerts/:id/acknowledge Record acknowledgement
+GET  /api/alerts/:id/statistics  Get delivery and acknowledgement totals
+
+alert:sent
+alert:received
+alert:viewed
+alert:acknowledged
+```
+
+API errors should use one predictable format:
+
+```javascript
+{ "error": { "code": "ALERT_NOT_FOUND", "message": "Alert was not found" } }
+```
+
+## Person A: Frontend Workstream
+
+### A1. Application shell and navigation
+
+- Set up React, routing, shared layout, loading states, and error states.
+- Add role-based entry points for authority and citizen views.
+- Add a small API client that can later switch from mock data to the backend URL.
+
+### A2. Citizen experience
+
+- Build active alert view with title, severity, summary, actions, visual instructions, and official message.
+- Add language selector using the `translations` contract.
+- Add browser text-to-speech controls.
+- Add large-text, high-contrast, reduced-motion, and low-connectivity settings.
+- Add acknowledgement flow and confirmation state.
+- Add citizen alert history.
+
+### A3. Authority experience
+
+- Build dashboard summary cards and alert history.
+- Build create-alert form with validation for official message, type, severity, affected area, and languages.
+- Build process/preview screen showing official content separately from generated content.
+- Build send action and acknowledgement statistics view.
+
+### A4. Frontend completion criteria
+
+- Every primary screen works with the shared mock alert.
+- Official text is visibly separate and never overwritten by simplified content.
+- The acknowledgement button has disabled, loading, success, and error states.
+- Layout remains usable on mobile width and with accessibility settings enabled.
+- Component tests cover alert rendering, language switching, and acknowledgement behavior.
+
+## Person B: Backend Workstream
+
+### B1. Service and data foundation
+
+- Set up Node.js, Express, Socket.IO, environment configuration, and error middleware.
+- Define alert, translation, recipient status, and acknowledgement persistence models.
+- Add seed data for the cyclone demo scenario.
+- Add validation for incoming alert payloads.
+
+### B2. Alert lifecycle API
+
+- Implement create, list, detail, process, send, view, acknowledge, and statistics endpoints.
+- Preserve `officialMessage` exactly as submitted.
+- Enforce valid status transitions: `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED`.
+- Make acknowledgement idempotent so repeated requests do not create duplicate state.
+- Return the shared alert shape and predictable errors.
+
+### B3. Processing and realtime delivery
+
+- Implement a deterministic demo processor for simplified text, translations, and visual instructions.
+- Keep the processor behind a service interface so a real AI provider can be added later.
+- Emit the agreed Socket.IO events when alerts change state.
+- Add CORS configuration and a health endpoint for local integration.
+
+### B4. Backend completion criteria
+
+- API tests cover validation, preservation of the official message, status transitions, idempotent acknowledgement, and statistics.
+- Socket events are emitted with the alert id and relevant status data.
+- Seeded demo data supports the complete authority-to-citizen flow.
+- Secrets and database credentials are read from environment variables, never committed.
+
+## Integration Sequence
+
+1. Merge the backend branch first if the client API client already targets the agreed contract; otherwise merge the frontend branch first with its mock adapter intact.
+2. Resolve only integration files such as root scripts, environment examples, and dependency lockfiles together.
+3. Start the backend and verify the frontend can load the seeded alert.
+4. Replace frontend mock calls one workflow at a time: list/detail, create/process, send, view, acknowledge, then statistics.
+5. Verify realtime delivery in two browser sessions: one authority session and one citizen session.
+6. Run the full test suite and perform a manual accessibility pass before merging to `main`.
+
+## Suggested Milestones
+
+| Milestone          | Person A                             | Person B                             | Exit check                               |
+| ------------------ | ------------------------------------ | ------------------------------------ | ---------------------------------------- |
+| M1: Foundations    | Shell, routes, mock alert            | Server, models, health endpoint      | Both apps run independently              |
+| M2: Core flow      | Citizen alert and acknowledgement UI | Alert lifecycle API                  | Mock and API flows use the same contract |
+| M3: Authority flow | Create, preview, dashboard UI        | Process, send, statistics API        | Authority can send a seeded alert        |
+| M4: Integration    | API client and Socket.IO client      | Realtime events and final validation | Two-browser end-to-end demo passes       |
+| M5: Hardening      | Accessibility and responsive tests   | API/security/error tests             | Release checklist is green               |
+
+## Merge Checklist
+
+- [ ] Branch is rebased or updated from the latest `main`.
+- [ ] No edits were made to the other workstream's owned implementation files.
+- [ ] Shared contract has not changed silently.
+- [ ] Tests and lint/type checks pass.
+- [ ] `.env.example` documents required non-secret configuration.
+- [ ] Official message preservation is verified.
+- [ ] Acknowledgement is clearly described as communication confirmation, not proof of safety.
+- [ ] The complete demo scenario works from alert creation to authority statistics.
+
+---
+
+# Project Setup
+
+The repository is initialized as an npm workspace with separate frontend and backend applications:
+
+```text
+client/   React + Vite citizen/authority interface
+server/   Express + Socket.IO API foundation
+```
+
+## First-Time Setup
+
+```bash
+git clone <repository-url>
+cd AlertBridge
+npm install
+```
+
+On Windows PowerShell, use `npm.cmd install` if the PowerShell execution policy blocks `npm`.
+
+Create local environment files from the committed examples when needed:
+
+```text
+client/.env.example -> client/.env
+server/.env.example -> server/.env
+```
+
+## Run Locally
+
+Open two terminals from the repository root:
+
+```bash
+npm run dev:server
+npm run dev:client
+```
+
+The client runs at `http://localhost:5173` and the server health check is available at `http://localhost:3000/health`.
+
+Useful checks:
+
+```bash
+npm run build
+npm test
+```
+
+## Start Separate Work
+
+After cloning and installing, each person creates their own branch from `main`:
+
+```bash
+git checkout -b feature/frontend-citizen-authority
+```
+
+or:
+
+```bash
+git checkout -b feature/backend-alert-platform
+```
+
+Person A follows [FRONTEND_IMPLEMENTATION.md](FRONTEND_IMPLEMENTATION.md). Person B follows [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md). Commit only the files owned by that workstream, then push the branch for review.
+
+---

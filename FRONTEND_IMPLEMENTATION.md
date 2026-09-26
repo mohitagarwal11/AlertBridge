@@ -1,0 +1,128 @@
+# AlertBridge Frontend Implementation
+
+Owner: Person A
+Branch: `feature/frontend-citizen-authority`
+
+This file is the implementation guide for the frontend branch. Backend work happens in `BACKEND_IMPLEMENTATION.md` on a separate branch.
+
+## Common Rules
+
+These rules apply to both branches and must not be changed independently:
+
+- Keep `officialMessage` unchanged and visibly separate from generated content.
+- Use the shared alert object and API contract below.
+- Acknowledgement means communication confirmation, not proof that a person is safe.
+- Use the status order `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED`.
+- Do not commit secrets. Use `.env.example` for required configuration.
+- Keep frontend implementation files inside `client/` or `src/`; avoid editing backend-owned files.
+
+## Shared Alert Contract
+
+Use this mock shape before the backend is ready:
+
+```javascript
+{
+  id: "ALR-001",
+  type: "cyclone",
+  severity: "critical",
+  affectedArea: "Coastal Odisha",
+  officialMessage: "Original authority message",
+  simplified: {
+    title: "CYCLONE APPROACHING",
+    summary: "Move to a safe location immediately.",
+    actions: ["Leave low-lying areas", "Go to a safe shelter"]
+  },
+  translations: { en: {}, hi: {}, or: {} },
+  visualInstructions: [{ icon: "shelter", text: "Go to a safe shelter" }],
+  status: "active",
+  createdAt: "2026-01-01T12:00:00.000Z",
+  expiresAt: "2026-01-02T12:00:00.000Z"
+}
+```
+
+Backend integration uses these endpoints:
+
+```text
+GET  /api/alerts
+GET  /api/alerts/:id
+POST /api/alerts
+POST /api/alerts/:id/process
+POST /api/alerts/:id/send
+POST /api/alerts/:id/view
+POST /api/alerts/:id/acknowledge
+GET  /api/alerts/:id/statistics
+```
+
+Backend errors have this shape:
+
+```javascript
+{ "error": { "code": "ALERT_NOT_FOUND", "message": "Alert was not found" } }
+```
+
+Realtime events to consume:
+
+```text
+alert:sent
+alert:received
+alert:viewed
+alert:acknowledged
+```
+
+## Implementation Tasks
+
+### 1. Application foundation
+
+- [ ] Set up the React/Vite application.
+- [ ] Add routing for authority and citizen areas.
+- [ ] Add shared layout, navigation, loading states, and error states.
+- [ ] Add an API client with a configurable backend URL.
+- [ ] Add mock data using the shared alert shape.
+
+### 2. Citizen workflow
+
+- [ ] Build the active alert screen.
+- [ ] Show severity, title, summary, affected area, actions, visual instructions, and expiry.
+- [ ] Show the official message in a separate, clearly labelled section.
+- [ ] Add language selection using `translations`.
+- [ ] Add browser text-to-speech playback and stop controls.
+- [ ] Add large-text, high-contrast, reduced-motion, and low-connectivity settings.
+- [ ] Add acknowledgement states: available, submitting, acknowledged, and failed.
+- [ ] Add citizen alert history.
+
+### 3. Authority workflow
+
+- [ ] Build the authority dashboard and alert history.
+- [ ] Build the create-alert form with validation for message, type, severity, location, and languages.
+- [ ] Build processing and preview screens.
+- [ ] Keep official content separate from simplified, translated, and visual content.
+- [ ] Add send-alert action with confirmation and error handling.
+- [ ] Add delivery, viewed, and acknowledgement statistics.
+
+### 4. Realtime behavior
+
+- [ ] Add a Socket.IO client service.
+- [ ] Update citizen views when `alert:received` or `alert:sent` arrives.
+- [ ] Update authority statistics when `alert:viewed` or `alert:acknowledged` arrives.
+- [ ] Reconnect cleanly and show a non-blocking connection state.
+
+## Frontend Acceptance Criteria
+
+- [ ] All primary screens work with mock data before backend integration.
+- [ ] Replacing the mock adapter with the API client does not change component contracts.
+- [ ] Official text cannot be overwritten by generated content in the UI.
+- [ ] The acknowledgement action is idempotent from the user's perspective.
+- [ ] The interface works on mobile width and with accessibility settings enabled.
+- [ ] Tests cover alert rendering, language switching, text-to-speech controls, and acknowledgement behavior.
+- [ ] No frontend task requires a change to backend implementation files.
+
+## Handoff To Integration
+
+Before opening the pull request:
+
+1. Run frontend tests, lint, and build checks.
+2. Confirm the mock alert matches the shared contract exactly.
+3. Document the frontend start command and required environment variables.
+4. Rebase onto the latest `main`.
+5. Test the API client against the backend branch or a local backend build.
+
+Do not silently modify the alert contract. Raise contract changes in the pull request description first.

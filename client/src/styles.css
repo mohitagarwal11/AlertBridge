@@ -1,0 +1,156 @@
+:root {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #19231f;
+  background: #f1eee7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+summary {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(100% - 2rem, 52rem);
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.topbar,
+.alert-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow,
+.severity,
+.location,
+.alert-id,
+.status {
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #54645c;
+  font-size: 0.75rem;
+}
+
+.status {
+  border: 1px solid #b8c8b2;
+  border-radius: 999px;
+  color: #36553e;
+  font-size: 0.7rem;
+  padding: 0.45rem 0.7rem;
+}
+
+.alert-panel {
+  margin-top: 4rem;
+  border-top: 0.45rem solid #ba321f;
+  background: #fffdf8;
+  box-shadow: 0 1rem 3rem rgba(35, 48, 42, 0.12);
+  padding: clamp(1.5rem, 6vw, 3.5rem);
+}
+
+.severity {
+  color: #ba321f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0 0 0.7rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 7vw, 4.8rem);
+  line-height: 0.95;
+  margin: 0;
+  max-width: 8ch;
+}
+
+.location {
+  color: #54645c;
+  font-size: 0.75rem;
+  margin: 1rem 0 0;
+}
+
+.alert-id {
+  color: #78847d;
+  font-size: 0.7rem;
+}
+
+.summary {
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+  line-height: 1.35;
+  margin: 3rem 0 1.5rem;
+  max-width: 32rem;
+}
+
+.actions {
+  display: grid;
+  gap: 0.7rem;
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.actions li {
+  border-left: 0.25rem solid #d49b2d;
+  padding: 0.7rem 1rem;
+}
+
+.acknowledge-button {
+  background: #1f5a46;
+  border: 0;
+  border-radius: 0.2rem;
+  color: #fffdf8;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  padding: 1rem 1.2rem;
+}
+
+.acknowledge-button:hover {
+  background: #164333;
+}
+
+.official-message {
+  border-bottom: 1px solid #c6cfc8;
+  color: #425249;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+}
+
+.official-message summary {
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+
+.official-message p {
+  line-height: 1.6;
+  max-width: 42rem;
+}
+
+@media (max-width: 520px) {
+  .alert-heading {
+    display: block;
+  }
+
+  .alert-id {
+    display: block;
+    margin-top: 1rem;
+  }
+}
