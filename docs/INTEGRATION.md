@@ -1,0 +1,81 @@
+# AlertBridge Integration Guide
+
+This guide covers the next phase after the independent frontend and backend branches: replacing frontend mock state with the live backend contract.
+
+## Local Environment
+
+### Backend
+
+Create `server/.env` from `server/.env.example`:
+
+```text
+PORT=3000
+CLIENT_ORIGIN=http://localhost:5173
+```
+
+### Frontend
+
+Create `client/.env` from `client/.env.example`:
+
+```text
+VITE_API_URL=http://localhost:3000
+VITE_SOCKET_URL=http://localhost:3000
+```
+
+Do not commit either `.env` file.
+
+## Run Both Applications
+
+From the repository root, use two terminals:
+
+```bash
+npm run dev:server
+npm run dev:client
+```
+
+Open `http://localhost:5173`. Check backend health at `http://localhost:3000/health`.
+
+## Integration Order
+
+1. Add `viewAlert` and `acknowledgeAlert` methods to the frontend API service.
+2. Add response adapters for `{ data: alerts }` and backend statistics fields such as `totalRecipients`.
+3. Replace citizen demo alert loading with `GET /api/alerts` and `GET /api/alerts/:id`.
+4. Replace citizen local acknowledgement timers with `POST /view` followed by `POST /acknowledge`.
+5. Replace authority local create/process/send state with the matching API endpoints.
+6. Load authority statistics from `GET /statistics` after send and after realtime updates.
+7. Keep Socket.IO event handlers focused on refreshing or merging persisted server state.
+8. Preserve the existing mock adapter as a fallback for offline UI development.
+
+## Two-Browser Verification
+
+1. Start the backend and frontend.
+2. Open one browser window at `/authority` and another at `/citizen`.
+3. Create and process an alert in the authority window.
+4. Send the alert and confirm the citizen window receives `alert:received`.
+5. Open the official message in the citizen window and verify it is unchanged.
+6. View and acknowledge the alert as the citizen.
+7. Confirm the authority statistics update through HTTP and Socket.IO.
+8. Refresh both windows and verify persisted server state is still represented.
+
+## Branch and Merge Procedure
+
+- Frontend work continues on `feature/frontend-citizen-authority` or its current successor branch.
+- Backend work continues on `feature/backend-alert-platform`.
+- Contract changes must be made first in [CONTRACT.md](CONTRACT.md) and called out in the pull request.
+- Merge only after both branches pass their own checks.
+- Resolve root `package.json`, lockfile, and environment documentation changes together.
+
+## Required Checks
+
+```bash
+npm run build
+npm run test
+npm run test:client
+```
+
+## Known Integration Risks
+
+- The frontend currently uses local mock state for authority workflows and local storage for citizen history.
+- The backend statistics response uses `totalRecipients`; the authority UI currently uses a local `recipients` field.
+- Backend persistence is in-memory, so restart behavior is not production persistence.
+- Socket events require the backend server to be running; disconnected UI states should remain usable.

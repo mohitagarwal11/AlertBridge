@@ -1,154 +1,66 @@
-# AlertBridge Backend Implementation
+# AlertBridge Backend Guide
 
 Owner: Person B
-Branch: `feature/backend-alert-platform`
+Primary branch: `feature/backend-alert-platform`
 
-This file is the implementation guide for the backend branch. Frontend work happens in `FRONTEND_IMPLEMENTATION.md` on a separate branch.
+This document describes the current backend implementation and remaining production work. The shared client/server contract lives in [docs/CONTRACT.md](docs/CONTRACT.md).
 
-## Common Rules
+## Current Implementation
 
-These rules apply to both branches and must not be changed independently:
+- Express application in `server/`
+- CORS, JSON parsing, health route, 404 handling, and centralized API errors
+- Alert routes for create, list, detail, process, send, view, acknowledge, and statistics
+- In-memory alert and recipient models with indexes
+- Seeded cyclone alert and recipient delivery/view/acknowledgement records
+- Immutable `officialMessage` model property
+- Deterministic processing service for simplified, translated, and visual representations
+- Socket.IO service for sent, received, viewed, acknowledged, and error events
+- Validation middleware for alert creation
+- Node built-in test runner with health and backend behavior coverage
 
-- Preserve `officialMessage` exactly as submitted.
-- Use the shared alert object and API contract below.
-- Acknowledgement means communication confirmation, not proof that a person is safe.
-- Enforce the status order `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED`.
-- Do not commit secrets. Use `.env.example` for required configuration.
-- Keep backend implementation inside `server/`, `api/`, and database-owned files; avoid editing frontend-owned files.
+## Persistence Reality
 
-## Shared Alert Contract
+The current database layer is an in-memory model, not PostgreSQL. Data is initialized on server start and is lost on restart. PostgreSQL, migrations, backups, and production retention policies are future work.
 
-All API responses must use this alert shape:
+## Run and Test
 
-```javascript
-{
-  id: "ALR-001",
-  type: "cyclone",
-  severity: "critical",
-  affectedArea: "Coastal Odisha",
-  officialMessage: "Original authority message",
-  simplified: {
-    title: "CYCLONE APPROACHING",
-    summary: "Move to a safe location immediately.",
-    actions: ["Leave low-lying areas", "Go to a safe shelter"]
-  },
-  translations: { en: {}, hi: {}, or: {} },
-  visualInstructions: [{ icon: "shelter", text: "Go to a safe shelter" }],
-  status: "active",
-  createdAt: "2026-01-01T12:00:00.000Z",
-  expiresAt: "2026-01-02T12:00:00.000Z"
-}
+From the repository root:
+
+```bash
+npm run dev:server
+npm run test
 ```
 
-Required endpoints:
+Health endpoint: `http://localhost:3000/health`
 
-```text
-POST /api/alerts                 Create a draft alert
-GET  /api/alerts                 List alerts
-GET  /api/alerts/:id             Get one alert
-POST /api/alerts/:id/process     Generate accessible representations
-POST /api/alerts/:id/send        Send an alert
-POST /api/alerts/:id/view        Record a citizen view
-POST /api/alerts/:id/acknowledge Record acknowledgement
-GET  /api/alerts/:id/statistics  Get delivery and acknowledgement totals
-```
+## API Ownership
 
-Required realtime events:
+The backend owns the HTTP and Socket.IO contract documented in [docs/CONTRACT.md](docs/CONTRACT.md). Lifecycle state must be persisted before its corresponding realtime event is emitted.
 
-```text
-alert:sent
-alert:received
-alert:viewed
-alert:acknowledged
-```
+Important invariants:
 
-All errors must use this format:
+- `officialMessage` cannot be replaced by generated content.
+- Recipient status progresses only from `PENDING` to `DELIVERED` to `VIEWED` to `ACKNOWLEDGED`.
+- Repeated acknowledgement is idempotent.
+- Missing alerts use the shared error response format.
+- Statistics currently expose `totalRecipients`, `delivered`, `viewed`, `acknowledged`, and `acknowledgementRate`.
 
-```javascript
-{ "error": { "code": "ALERT_NOT_FOUND", "message": "Alert was not found" } }
-```
+## Remaining Backend Work
 
-## Implementation Tasks
+- Replace in-memory models with PostgreSQL and migrations.
+- Add authentication and role-based authorization for authorities.
+- Add signed alerts, audit logs, rate limiting, and secure secret handling.
+- Add stronger lifecycle validation for send and expiration behavior.
+- Add production AI provider integration behind the processing service interface.
+- Add broader API, socket, and persistence tests.
 
-### 1. Service foundation
+## Backend Handoff
 
-- [x] Set up Node.js, Express, Socket.IO, and environment configuration.
-- [x] Add health endpoint and centralized error middleware.
-- [x] Add request validation and CORS configuration.
-- [x] Add database connection and migration/seed strategy.
-- [x] Add cyclone demo seed data.
+Before merging client integration:
 
-### 2. Data model
-
-- [x] Define alert persistence with original message, generated content, status, and timestamps.
-- [x] Define translations and visual instructions.
-- [x] Define recipient delivery, viewed, and acknowledgement timestamps.
-- [x] Add indexes for alert status, creation time, and recipient lookup.
-- [x] Ensure generated data cannot replace `officialMessage`.
-
-### 3. Alert lifecycle API
-
-- [x] Implement create, list, detail, process, send, view, acknowledge, and statistics endpoints.
-- [x] Validate required fields and reject malformed alert data with the shared error format.
-- [x] Enforce `PENDING -> DELIVERED -> VIEWED -> ACKNOWLEDGED` transitions.
-- [x] Make acknowledgement idempotent.
-- [x] Return the shared alert shape from detail and lifecycle responses.
-
-### 4. Processing service
-
-- [x] Implement a deterministic demo processor for simplified text, translations, actions, and visual instructions.
-- [x] Put processing behind a service interface so a real AI provider can replace the demo implementation later.
-- [x] Store generated representations separately from the official message.
-- [x] Add tests proving the official message is byte-for-byte unchanged.
-
-### 5. Realtime delivery
-
-- [x] Emit `alert:sent` after a successful send.
-- [x] Emit `alert:received` for the citizen delivery simulation.
-- [x] Emit `alert:viewed` and `alert:acknowledged` after successful state changes.
-- [x] Include alert id and relevant status/statistics data in event payloads.
-- [x] Handle disconnected clients without corrupting persistence state.
-
-## Backend Acceptance Criteria
-
-- [x] API tests cover validation, all lifecycle endpoints, status transitions, and predictable errors.
-- [x] Repeated acknowledgement requests do not create duplicate state or inflate statistics.
-- [x] Statistics correctly report sent, delivered, viewed, and acknowledged totals.
-- [x] Socket events are emitted only after the corresponding state is persisted.
-- [x] Seeded data supports the complete authority-to-citizen demo.
-- [x] Secrets and database credentials come only from environment variables.
-- [x] No backend task requires a change to frontend implementation files.
-
-## Handoff To Integration
-
-Before opening the pull request:
-
-1. Run backend tests, lint, and build checks (`npm test`).
-2. Confirm every endpoint and event matches this document exactly.
-3. Document the backend start command and required environment variables.
-4. Rebase onto the latest `main`.
-5. Provide a seeded alert id and example requests for frontend integration.
-
-### Frontend Integration Information
-
-- **Start Command**: `npm run dev:server` (or `npm --workspace server run start`)
-- **Base URL**: `http://localhost:3000`
-- **Health Check**: `GET http://localhost:3000/health`
-- **Environment Variables**:
-  - `PORT`: Server port (default `3000`)
-  - `CLIENT_ORIGIN`: Allowed CORS origin (default `http://localhost:5173`)
-  - `NODE_ENV`: Environment mode (`development` / `test` / `production`)
-
-### Seeded Demo Alert
-
-- **Seeded Alert ID**: `ALR-001` (Cyclone Demo Scenario)
-- **API Endpoints**:
-  - `GET /api/alerts`: List alerts
-  - `GET /api/alerts/ALR-001`: Get single alert
-  - `POST /api/alerts/ALR-001/process`: Generate accessibility versions
-  - `POST /api/alerts/ALR-001/send`: Activate alert
-  - `POST /api/alerts/ALR-001/view`: Record citizen view
-  - `POST /api/alerts/ALR-001/acknowledge`: Record acknowledgement (idempotent)
-  - `GET /api/alerts/ALR-001/statistics`: Get delivery statistics
-
-Do not silently modify the alert contract. Raise contract changes in the pull request description first.
+- [ ] Contract responses are covered by API tests.
+- [ ] View and acknowledgement endpoints are idempotent and tested.
+- [ ] Statistics match the documented response shape.
+- [ ] Socket events are emitted only after persistence.
+- [ ] Seeded demo flow works after a clean server start.
+- [ ] Client integration has been verified in two browser sessions.
