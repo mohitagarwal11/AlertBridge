@@ -1,6 +1,7 @@
 import { alertModel } from "../models/alertModel.js";
 import { recipientModel } from "../models/recipientModel.js";
 import { processingService } from "../services/processingService.js";
+import { socketService } from "../services/socketService.js";
 import { ApiError } from "../middleware/errorHandler.js";
 
 export async function createAlert(req, res, next) {
@@ -85,6 +86,10 @@ export async function sendAlert(req, res, next) {
     }
 
     const updated = alertModel.updateStatus(id, "active");
+    
+    // Emit realtime alert:sent and alert:received events after state is persisted
+    socketService.emitAlertSent(updated);
+
     res.json(updated);
   } catch (err) {
     next(err);
@@ -101,6 +106,11 @@ export async function viewAlert(req, res, next) {
 
     const userId = req.body?.userId || "USR-CITIZEN";
     const record = recipientModel.recordView(id, userId);
+    const statistics = recipientModel.getStatistics(id);
+
+    // Emit realtime alert:viewed event after state is persisted
+    socketService.emitAlertViewed(id, userId, record, statistics);
+
     res.json(record);
   } catch (err) {
     next(err);
@@ -117,6 +127,11 @@ export async function acknowledgeAlert(req, res, next) {
 
     const userId = req.body?.userId || "USR-CITIZEN";
     const record = recipientModel.recordAcknowledgement(id, userId);
+    const statistics = recipientModel.getStatistics(id);
+
+    // Emit realtime alert:acknowledged event after state is persisted
+    socketService.emitAlertAcknowledged(id, userId, record, statistics);
+
     res.json(record);
   } catch (err) {
     next(err);
