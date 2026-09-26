@@ -46,6 +46,23 @@ Open `http://localhost:5173`. Check backend health at `http://localhost:3000/hea
 7. Keep Socket.IO event handlers focused on refreshing or merging persisted server state.
 8. Preserve the existing mock adapter as a fallback for offline UI development.
 
+## Workstream Independence
+
+The branches can proceed in parallel until the live integration boundary:
+
+| Work                                   | Independent? | Coordination needed                                 |
+| -------------------------------------- | ------------ | --------------------------------------------------- |
+| Frontend F1 API service boundary       | Yes          | Use `docs/CONTRACT.md`; mock HTTP responses         |
+| Frontend F4 tests and lint             | Yes          | None beyond shared scripts                          |
+| Backend B1 contract/API tests          | Yes          | Keep response shapes canonical                      |
+| Backend B2 lifecycle/model work        | Yes          | Preserve status and immutability rules              |
+| Backend B4 backend tests               | Yes          | Run against seeded in-memory backend                |
+| Frontend F2 citizen live integration   | No           | Backend `/view`, `/acknowledge`, and alert payloads |
+| Frontend F3 authority live integration | No           | Backend statistics and lifecycle responses          |
+| Backend B3 client integration support  | No           | Frontend adapters and realtime event consumers      |
+
+Special care is required for `alertId` filtering, `totalRecipients` statistics naming, idempotent acknowledgement retries, and event ordering after persistence.
+
 ## Two-Browser Verification
 
 1. Start the backend and frontend.
