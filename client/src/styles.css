@@ -594,6 +594,359 @@ h1 {
   max-width: 40rem;
 }
 
+.authority-intro {
+  margin-bottom: 2rem;
+}
+
+.authority-dashboard,
+.authority-form-panel,
+.preview-panel,
+.authority-history {
+  background: rgba(255, 253, 248, 0.72);
+  border-top: 0.3rem solid #1f5a46;
+  padding: clamp(1.3rem, 4vw, 2.2rem);
+}
+
+.authority-dashboard h2,
+.panel-heading h2 {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1;
+  margin: 0.7rem 0 0;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 2rem;
+}
+
+.stat-card {
+  border-left: 0.2rem solid #d49b2d;
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+}
+
+.stat-card span,
+.rate-row,
+.preview-label,
+.history-status {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-card strong {
+  font-size: clamp(1.3rem, 3vw, 2.1rem);
+}
+
+.rate-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.rate-row strong {
+  color: #1f5a46;
+  font-size: 1rem;
+}
+
+.rate-bar {
+  background: #dce3dc;
+  height: 0.55rem;
+  margin-top: 0.6rem;
+  overflow: hidden;
+}
+
+.rate-bar span {
+  background: #1f5a46;
+  display: block;
+  height: 100%;
+}
+
+.authority-workspace {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 1rem;
+}
+
+.authority-form-panel,
+.preview-panel {
+  border-top-color: #ba321f;
+}
+
+.authority-form-panel form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.form-field,
+.language-fieldset {
+  border: 0;
+  color: #425249;
+  display: grid;
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  gap: 0.4rem;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  background: #fffdf8;
+  border: 1px solid #aebdb1;
+  border-radius: 0.15rem;
+  color: #19231f;
+  font:
+    1rem Georgia,
+    "Times New Roman",
+    serif;
+  padding: 0.7rem;
+  width: 100%;
+}
+
+.form-field textarea {
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #1f5a46;
+  outline: 0.15rem solid rgba(31, 90, 70, 0.18);
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.language-fieldset legend {
+  margin-bottom: 0.4rem;
+  padding: 0;
+}
+
+.language-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.check-option {
+  align-items: center;
+  display: flex;
+  font-weight: 400;
+  gap: 0.35rem;
+}
+
+.check-option input {
+  accent-color: #1f5a46;
+  height: 1rem;
+  width: 1rem;
+}
+
+.field-error {
+  color: #ba321f;
+  font-size: 0.7rem;
+}
+
+.form-field[aria-invalid="true"],
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+  border-color: #ba321f;
+}
+
+.form-submit {
+  border: 0;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.preview-empty {
+  border: 1px dashed #aebdb1;
+  color: #54645c;
+  margin-top: 2rem;
+  padding: 1.4rem;
+}
+
+.preview-status {
+  background: #e3e8df;
+  color: #1f5a46;
+  font-family: Arial, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  padding: 0.6rem 0.8rem;
+  text-transform: uppercase;
+}
+
+.official-preview,
+.generated-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.official-preview {
+  background: #edf0eb;
+  border-left: 0.2rem solid #78847d;
+}
+
+.generated-preview {
+  background: #fffdf8;
+  border-left: 0.2rem solid #d49b2d;
+}
+
+.official-preview p,
+.generated-preview p {
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+.generated-preview h3 {
+  font-size: 1.8rem;
+  line-height: 0.95;
+  margin: 1rem 0 0;
+}
+
+.preview-actions {
+  line-height: 1.5;
+  margin-bottom: 0;
+  padding-left: 1.1rem;
+}
+
+.send-button {
+  background: #ba321f;
+  border: 0;
+  color: #fffdf8;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+}
+
+.send-button:hover {
+  background: #8f2618;
+}
+
+.send-button:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.send-confirmation {
+  background: #fff4df;
+  border-left: 0.25rem solid #d49b2d;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.send-confirmation p {
+  color: #54645c;
+  margin: 0.5rem 0 1rem;
+}
+
+.confirmation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.success-message {
+  color: #1f5a46;
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 1rem 0 0;
+}
+
+.send-error {
+  color: #ba321f;
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 1rem 0 0;
+}
+
+.authority-history {
+  border-top-color: #d49b2d;
+  margin-top: 1rem;
+}
+
+.authority-history-list {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.authority-history-item {
+  align-items: center;
+  background: rgba(255, 253, 248, 0.7);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 7rem minmax(0, 1fr) minmax(8rem, 0.7fr) 5rem;
+  padding: 0.9rem 1rem;
+}
+
+.history-status {
+  color: #1f5a46;
+  font-weight: 700;
+}
+
+.history-status.active,
+.history-status.sent {
+  color: #ba321f;
+}
+
+.authority-history-item > span:not(.history-status) {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 800px) {
+  .authority-workspace,
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .authority-history-item {
+    grid-template-columns: 6rem minmax(0, 1fr) 5rem;
+  }
+
+  .authority-history-item > span:nth-child(3) {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 580px) {
+  .authority-workspace,
+  .stats-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .authority-history-item {
+    align-items: start;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .authority-history-item > span:nth-child(3) {
+    grid-column: auto;
+  }
+}
+
 .empty-panel h2 {
   font-size: clamp(1.6rem, 4vw, 2.6rem);
   line-height: 1;

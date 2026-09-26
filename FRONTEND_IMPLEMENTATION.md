@@ -91,12 +91,12 @@ alert:acknowledged
 
 ### 3. Authority workflow
 
-- [ ] Build the authority dashboard and alert history.
-- [ ] Build the create-alert form with validation for message, type, severity, location, and languages.
-- [ ] Build processing and preview screens.
-- [ ] Keep official content separate from simplified, translated, and visual content.
-- [ ] Add send-alert action with confirmation and error handling.
-- [ ] Add delivery, viewed, and acknowledgement statistics.
+- [x] Build the authority dashboard and alert history.
+- [x] Build the create-alert form with validation for message, type, severity, location, and languages.
+- [x] Build processing and preview screens.
+- [x] Keep official content separate from simplified, translated, and visual content.
+- [x] Add send-alert action with confirmation and error handling.
+- [x] Add delivery, viewed, and acknowledgement statistics.
 
 ### 4. Realtime behavior
 
@@ -113,7 +113,7 @@ alert:acknowledged
 - [x] The acknowledgement action is idempotent from the user's perspective.
 - [x] The interface works on mobile width and with accessibility settings enabled.
 - [ ] Tests cover alert rendering, language switching, text-to-speech controls, and acknowledgement behavior.
-- [ ] No frontend task requires a change to backend implementation files.
+- [x] No frontend task requires a change to backend implementation files.
 
 ## Handoff To Integration
 
