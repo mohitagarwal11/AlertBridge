@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ConnectionStatus from "../components/ui/ConnectionStatus";
 import { demoAlert, demoAlerts } from "../data/demoAlerts";
 import { useAlertSocket } from "../hooks/useAlertSocket";
+import { api } from "../services/api";
 
 const initialForm = {
   officialMessage: demoAlert.officialMessage,
@@ -55,12 +56,43 @@ export default function AuthorityPage() {
   const [processedAlert, setProcessedAlert] = useState(null);
   const [alertStatus, setAlertStatus] = useState("draft");
   const [sendState, setSendState] = useState("idle");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [liveError, setLiveError] = useState("");
   const [statistics, setStatistics] = useState(initialStatistics);
   const [history, setHistory] = useState(demoAlerts);
 
+  useEffect(() => {
+    api
+      .listAlerts()
+      .then((alerts) => {
+        if (alerts.length > 0) setHistory(alerts);
+      })
+      .catch(() => {
+        // Keep seeded demo history when the API is unavailable.
+      });
+  }, []);
+
+  useEffect(() => {
+    const alertId = history[0]?.id;
+    if (!alertId) return;
+
+    api
+      .getStatistics(alertId)
+      .then((nextStatistics) => {
+        setStatistics((current) => ({ ...current, ...nextStatistics }));
+      })
+      .catch(() => {
+        // Keep local demo statistics until the backend is available.
+      });
+  }, [history]);
+
   const connectionState = useAlertSocket({
-    "alert:sent": () => setAlertStatus("sent"),
+    "alert:sent": (payload) => {
+      if (processedAlert && payload?.alertId !== processedAlert.id) return;
+      setAlertStatus("sent");
+    },
     "alert:viewed": (payload) => {
+      if (processedAlert && payload?.alertId !== processedAlert.id) return;
       const incomingStatistics = payload?.statistics || payload;
       setStatistics((current) =>
         typeof incomingStatistics?.viewed === "number"
@@ -69,6 +101,7 @@ export default function AuthorityPage() {
       );
     },
     "alert:acknowledged": (payload) => {
+      if (processedAlert && payload?.alertId !== processedAlert.id) return;
       const incomingStatistics = payload?.statistics || payload;
       setStatistics((current) =>
         typeof incomingStatistics?.acknowledged === "number"
@@ -96,7 +129,7 @@ export default function AuthorityPage() {
     updateForm("languages", languages);
   }
 
-  function processAlert(event) {
+  async function processAlert(event) {
     event.preventDefault();
     const errors = validateForm(form);
     if (Object.keys(errors).length > 0) {
@@ -104,19 +137,39 @@ export default function AuthorityPage() {
       return;
     }
 
-    const generated = createGeneratedContent(form);
-    setProcessedAlert({
-      ...demoAlert,
-      id: `ALR-${String(history.length + 1).padStart(3, "0")}`,
-      type: form.type,
-      severity: form.severity,
-      affectedArea: form.affectedArea.trim(),
-      officialMessage: form.officialMessage.trim(),
-      simplified: generated,
-      status: "processed",
-    });
-    setAlertStatus("processed");
-    setSendState("idle");
+    setIsProcessing(true);
+    setLiveError("");
+
+    try {
+      const created = await api.createAlert({
+        type: form.type,
+        severity: form.severity,
+        affectedArea: form.affectedArea.trim(),
+        officialMessage: form.officialMessage.trim(),
+        languages: form.languages,
+      });
+      const processed = await api.processAlert(created.id);
+      setProcessedAlert(processed);
+      setAlertStatus("processed");
+      setSendState("idle");
+    } catch {
+      const generated = createGeneratedContent(form);
+      setProcessedAlert({
+        ...demoAlert,
+        id: `ALR-${String(history.length + 1).padStart(3, "0")}`,
+        type: form.type,
+        severity: form.severity,
+        affectedArea: form.affectedArea.trim(),
+        officialMessage: form.officialMessage.trim(),
+        simplified: generated,
+        status: "processed",
+      });
+      setAlertStatus("processed");
+      setSendState("idle");
+      setLiveError("Backend unavailable. Showing a local preview.");
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   function sendAlert() {
@@ -124,20 +177,24 @@ export default function AuthorityPage() {
     setSendState("confirming");
   }
 
-  function confirmSend() {
+  async function confirmSend() {
     setSendState("sending");
-    window.setTimeout(() => {
-      try {
-        if (!processedAlert)
-          throw new Error("No processed alert is available.");
-        setAlertStatus("sent");
-        setSendState("sent");
-        setHistory((current) => [processedAlert, ...current]);
-        setStatistics((current) => ({ ...current, recipients: 10000 }));
-      } catch {
-        setSendState("error");
-      }
-    }, 400);
+    try {
+      if (!processedAlert) throw new Error("No processed alert is available.");
+      const sentAlert = await api.sendAlert(processedAlert.id);
+      setProcessedAlert(sentAlert);
+      setAlertStatus("sent");
+      setSendState("sent");
+      setHistory((current) => [
+        sentAlert,
+        ...current.filter((alert) => alert.id !== sentAlert.id),
+      ]);
+      const nextStatistics = await api.getStatistics(sentAlert.id);
+      setStatistics((current) => ({ ...current, ...nextStatistics }));
+    } catch {
+      setSendState("error");
+      setLiveError("The alert could not be sent by the backend.");
+    }
   }
 
   return (
@@ -284,8 +341,15 @@ export default function AuthorityPage() {
               )}
             </fieldset>
             <button className="primary-action form-submit" type="submit">
-              Process alert for preview
+              {isProcessing
+                ? "Processing alert..."
+                : "Process alert for preview"}
             </button>
+            {liveError && (
+              <p className="send-error" role="alert">
+                {liveError}
+              </p>
+            )}
           </form>
         </section>
 

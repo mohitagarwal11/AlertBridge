@@ -1,9 +1,18 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CitizenPage from "./CitizenPage";
+import { api } from "../services/api";
 
 vi.mock("../hooks/useAlertSocket", () => ({
   useAlertSocket: () => "connected",
+}));
+
+vi.mock("../services/api", () => ({
+  api: {
+    listAlerts: vi.fn().mockResolvedValue([]),
+    viewAlert: vi.fn().mockResolvedValue({ status: "VIEWED" }),
+    acknowledgeAlert: vi.fn().mockResolvedValue({ status: "ACKNOWLEDGED" }),
+  },
 }));
 
 describe("CitizenPage", () => {
@@ -32,6 +41,8 @@ describe("CitizenPage", () => {
       screen.getByText(/Due to the severe cyclonic storm/),
     ).toBeInTheDocument();
     expect(screen.getByText("Live updates connected")).toBeInTheDocument();
+    expect(api.listAlerts).toHaveBeenCalledTimes(1);
+    expect(api.viewAlert).toHaveBeenCalledWith("ALR-001", "USR-CITIZEN");
   });
 
   it("changes the alert representation when a language is selected", () => {
@@ -64,18 +75,12 @@ describe("CitizenPage", () => {
   });
 
   it("persists an acknowledgement and disables duplicate acknowledgement", async () => {
-    vi.useFakeTimers();
     render(<CitizenPage />);
 
     const acknowledgeButton = screen.getByRole("button", {
       name: "I understand this alert",
     });
-    fireEvent.click(acknowledgeButton);
-
-    expect(
-      screen.getByRole("button", { name: "Saving acknowledgement..." }),
-    ).toBeDisabled();
-    act(() => vi.advanceTimersByTime(350));
+    await act(async () => fireEvent.click(acknowledgeButton));
 
     expect(
       screen.getByRole("button", { name: "Alert acknowledged" }),
@@ -84,6 +89,7 @@ describe("CitizenPage", () => {
       JSON.parse(localStorage.getItem("alertbridge.citizen.history")),
     ).toHaveLength(1);
     expect(screen.getByText(/Acknowledged/)).toBeInTheDocument();
+    expect(api.acknowledgeAlert).toHaveBeenCalledWith("ALR-001", "USR-CITIZEN");
   });
 
   it("applies accessibility settings to the page", () => {

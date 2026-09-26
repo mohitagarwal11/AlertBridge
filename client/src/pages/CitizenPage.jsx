@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ConnectionStatus from "../components/ui/ConnectionStatus";
 import { demoAlert } from "../data/demoAlerts";
 import { useAlertSocket } from "../hooks/useAlertSocket";
+import { api } from "../services/api";
 
 const languageOptions = [
   { code: "en", label: "English", speech: "en-IN" },
@@ -28,6 +29,7 @@ export default function CitizenPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [acknowledgement, setAcknowledgement] = useState("available");
   const [history, setHistory] = useState([]);
+  const viewedAlertIds = useRef(new Set());
   const copy =
     activeAlert.translations[language] || activeAlert.translations.en;
   const selectedLanguage = languageOptions.find(
@@ -66,6 +68,37 @@ export default function CitizenPage() {
     };
   }, [language]);
 
+  useEffect(() => {
+    if (isLowConnectivity) return;
+
+    let cancelled = false;
+    api
+      .listAlerts()
+      .then((alerts) => {
+        if (cancelled || alerts.length === 0) return;
+        const activeAlert =
+          alerts.find((alert) => alert.status === "active") || alerts[0];
+        setActiveAlert(activeAlert);
+        setAcknowledgement("available");
+      })
+      .catch(() => {
+        // Keep the seeded demo alert when the API is unavailable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLowConnectivity]);
+
+  useEffect(() => {
+    if (isLowConnectivity || viewedAlertIds.current.has(activeAlert.id)) return;
+
+    viewedAlertIds.current.add(activeAlert.id);
+    api.viewAlert(activeAlert.id, "USR-CITIZEN").catch(() => {
+      viewedAlertIds.current.delete(activeAlert.id);
+    });
+  }, [activeAlert.id, isLowConnectivity]);
+
   const speechText = useMemo(
     () => [copy.title, copy.summary, ...copy.actions].join(". "),
     [copy],
@@ -86,10 +119,14 @@ export default function CitizenPage() {
     setIsSpeaking(true);
   }
 
-  function acknowledgeAlert() {
+  async function acknowledgeAlert() {
     if (!["available", "failed"].includes(acknowledgement)) return;
     setAcknowledgement("submitting");
-    window.setTimeout(() => {
+    try {
+      if (!isLowConnectivity) {
+        await api.acknowledgeAlert(activeAlert.id, "USR-CITIZEN");
+      }
+
       const acknowledgedAt = new Date().toISOString();
       const nextHistory = [
         { alertId: activeAlert.id, title: copy.title, acknowledgedAt },
@@ -102,7 +139,9 @@ export default function CitizenPage() {
       } catch {
         setAcknowledgement("failed");
       }
-    }, 350);
+    } catch {
+      setAcknowledgement("failed");
+    }
   }
 
   const pageClasses = [

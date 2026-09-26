@@ -59,6 +59,34 @@ test("POST /api/alerts rejects malformed input with shared error format", async 
   });
 });
 
+test("POST /api/alerts rejects invalid languages and expiry values", async (t) => {
+  const app = createApp();
+  const server = app.listen(0);
+  t.after(() => server.close());
+
+  const address = server.address();
+  const res = await fetch(`http://localhost:${address.port}/api/alerts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "flood",
+      severity: "warning",
+      affectedArea: "Riverside District",
+      officialMessage: "Flooding is expected near the river banks.",
+      languages: ["en", 42],
+      expiresAt: "not-a-date",
+    }),
+  });
+
+  assert.equal(res.status, 400);
+  assert.deepEqual(await res.json(), {
+    error: {
+      code: "INVALID_ALERT_DATA",
+      message: "Alert 'languages' must be an array of non-empty strings",
+    },
+  });
+});
+
 test("GET /api/alerts lists all alerts including seeded cyclone demo", async (t) => {
   const app = createApp();
   const server = app.listen(0);
@@ -80,15 +108,19 @@ test("GET /api/alerts/:id returns single alert detail or 404 error", async (t) =
   t.after(() => server.close());
 
   const address = server.address();
-  
+
   // Existing alert
-  const res1 = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001`);
+  const res1 = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001`,
+  );
   assert.equal(res1.status, 200);
   const alert = await res1.json();
   assert.equal(alert.id, "ALR-001");
 
   // Non-existent alert
-  const res2 = await fetch(`http://localhost:${address.port}/api/alerts/NON_EXISTENT`);
+  const res2 = await fetch(
+    `http://localhost:${address.port}/api/alerts/NON_EXISTENT`,
+  );
   assert.equal(res2.status, 404);
   const errBody = await res2.json();
   assert.deepEqual(errBody, {
@@ -105,9 +137,12 @@ test("POST /api/alerts/:id/process generates accessible representations preservi
   t.after(() => server.close());
 
   const address = server.address();
-  const res = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/process`, {
-    method: "POST",
-  });
+  const res = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/process`,
+    {
+      method: "POST",
+    },
+  );
 
   assert.equal(res.status, 200);
   const alert = await res.json();
@@ -124,13 +159,51 @@ test("POST /api/alerts/:id/send updates alert status to active", async (t) => {
   t.after(() => server.close());
 
   const address = server.address();
-  const res = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/send`, {
-    method: "POST",
-  });
+  const res = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/send`,
+    {
+      method: "POST",
+    },
+  );
 
   assert.equal(res.status, 200);
   const alert = await res.json();
   assert.equal(alert.status, "active");
+});
+
+test("POST /api/alerts/:id/send rejects expired alerts", async (t) => {
+  const app = createApp();
+  const server = app.listen(0);
+  t.after(() => server.close());
+
+  const address = server.address();
+  const createRes = await fetch(`http://localhost:${address.port}/api/alerts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "flood",
+      severity: "warning",
+      affectedArea: "Riverside District",
+      officialMessage: "Flooding is expected near the river banks.",
+      expiresAt: "2020-01-01T00:00:00.000Z",
+    }),
+  });
+  const created = await createRes.json();
+
+  const sendRes = await fetch(
+    `http://localhost:${address.port}/api/alerts/${created.id}/send`,
+    {
+      method: "POST",
+    },
+  );
+
+  assert.equal(sendRes.status, 400);
+  assert.deepEqual(await sendRes.json(), {
+    error: {
+      code: "ALERT_EXPIRED",
+      message: "Expired alerts cannot be sent",
+    },
+  });
 });
 
 test("POST /api/alerts/:id/view and POST /api/alerts/:id/acknowledge record citizen lifecycle state", async (t) => {
@@ -139,33 +212,42 @@ test("POST /api/alerts/:id/view and POST /api/alerts/:id/acknowledge record citi
   t.after(() => server.close());
 
   const address = server.address();
-  
+
   // View
-  const viewRes = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/view`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: "USR-999" }),
-  });
+  const viewRes = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/view`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: "USR-999" }),
+    },
+  );
   assert.equal(viewRes.status, 200);
   const viewRecord = await viewRes.json();
   assert.equal(viewRecord.status, "VIEWED");
 
   // Acknowledge
-  const ackRes = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/acknowledge`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: "USR-999" }),
-  });
+  const ackRes = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/acknowledge`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: "USR-999" }),
+    },
+  );
   assert.equal(ackRes.status, 200);
   const ackRecord = await ackRes.json();
   assert.equal(ackRecord.status, "ACKNOWLEDGED");
 
   // Repeated acknowledgement is idempotent
-  const repeatAckRes = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/acknowledge`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId: "USR-999" }),
-  });
+  const repeatAckRes = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/acknowledge`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: "USR-999" }),
+    },
+  );
   assert.equal(repeatAckRes.status, 200);
   const repeatRecord = await repeatAckRes.json();
   assert.equal(repeatRecord.acknowledgedAt, ackRecord.acknowledgedAt);
@@ -177,7 +259,9 @@ test("GET /api/alerts/:id/statistics returns delivery and acknowledgement counts
   t.after(() => server.close());
 
   const address = server.address();
-  const res = await fetch(`http://localhost:${address.port}/api/alerts/ALR-001/statistics`);
+  const res = await fetch(
+    `http://localhost:${address.port}/api/alerts/ALR-001/statistics`,
+  );
 
   assert.equal(res.status, 200);
   const stats = await res.json();

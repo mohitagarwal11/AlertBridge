@@ -56,38 +56,38 @@ The UI is currently mock-first. Complete these tasks on the frontend branch in t
 
 ### F1: API Service Boundary
 
-- [ ] Add `viewAlert(alertId, userId)` to `client/src/services/api.js`.
-- [ ] Add `acknowledgeAlert(alertId, userId)` to `client/src/services/api.js`.
-- [ ] Add a shared response adapter for `{ data: alerts }`.
-- [ ] Add a statistics adapter from `totalRecipients` to the authority view's display model.
-- [ ] Normalize API errors into the existing error-state format.
-- [ ] Add unit tests for methods, request paths, payloads, successful responses, and API errors.
+- [x] Add `viewAlert(alertId, userId)` to `client/src/services/api.js`.
+- [x] Add `acknowledgeAlert(alertId, userId)` to `client/src/services/api.js`.
+- [x] Add a shared response adapter for `{ data: alerts }`.
+- [x] Add a statistics adapter from `totalRecipients` to the authority view's display model.
+- [x] Normalize API errors into the existing error-state format.
+- [x] Add unit tests for methods, request paths, payloads, successful responses, and API errors.
 
 ### F2: Citizen Live Integration
 
-- [ ] Load the active alert from `GET /api/alerts` or `GET /api/alerts/:id`.
-- [ ] Keep the demo adapter available when the API is unavailable or low-connectivity mode is selected.
-- [ ] Send `POST /api/alerts/:id/view` when the active alert is opened, once per alert view.
-- [ ] Send `POST /api/alerts/:id/acknowledge` when the citizen confirms the alert.
-- [ ] Keep local history as a display cache, but treat the server response as authoritative.
-- [ ] Update the active alert from realtime payloads without losing the official message.
+- [x] Load the active alert from `GET /api/alerts` or `GET /api/alerts/:id`.
+- [x] Keep the demo adapter available when the API is unavailable or low-connectivity mode is selected.
+- [x] Send `POST /api/alerts/:id/view` when the active alert is opened, once per alert view.
+- [x] Send `POST /api/alerts/:id/acknowledge` when the citizen confirms the alert.
+- [x] Keep local history as a display cache, but treat the server response as authoritative.
+- [x] Update the active alert from realtime payloads without losing the official message.
 
 ### F3: Authority Live Integration
 
-- [ ] Create alerts through `POST /api/alerts`.
-- [ ] Process alerts through `POST /api/alerts/:id/process`.
-- [ ] Replace local send simulation with `POST /api/alerts/:id/send`.
-- [ ] Load history from `GET /api/alerts`.
-- [ ] Load statistics from `GET /api/alerts/:id/statistics` after send and on refresh.
-- [ ] Merge `alert:viewed` and `alert:acknowledged` events into the server statistics model.
-- [ ] Show server errors and retry states for every live request.
+- [x] Create alerts through `POST /api/alerts`.
+- [x] Process alerts through `POST /api/alerts/:id/process`.
+- [x] Replace local send simulation with `POST /api/alerts/:id/send`.
+- [x] Load history from `GET /api/alerts`.
+- [x] Load statistics from `GET /api/alerts/:id/statistics` after send and on refresh.
+- [x] Merge `alert:viewed` and `alert:acknowledged` events into the server statistics model.
+- [x] Show server errors and retry states for every live request.
 
 ### F4: Verification and Developer Experience
 
-- [ ] Add API integration tests for citizen and authority workflows.
-- [ ] Add Socket.IO handler tests for sent, received, viewed, and acknowledged payloads.
-- [ ] Add authority page tests for validation, preview, send confirmation, and statistics.
-- [ ] Add a lint script, or remove lint from required checks until a linter is configured.
+- [x] Add API boundary tests for citizen and authority requests.
+- [x] Add Socket.IO hook tests for sent, received, viewed, and acknowledged payloads.
+- [x] Add authority page tests for validation, preview, send confirmation, and statistics.
+- [x] Keep lint out of required checks until a linter is configured.
 - [ ] Verify the two-browser flow against a running backend.
 
 ### Frontend Completion Definition
@@ -126,9 +126,9 @@ Person A can finish F1 and F4 on the frontend branch while Person B works on B1-
 
 Before merging the integration work:
 
-- [ ] F1 API service boundary is complete.
-- [ ] F2 citizen live integration is complete.
-- [ ] F3 authority live integration is complete.
-- [ ] F4 verification and developer experience are complete.
-- [ ] Frontend tests and build pass.
+- [x] F1 API service boundary is complete.
+- [x] F2 citizen live integration is complete.
+- [x] F3 authority live integration is complete.
+- [x] F4 independent verification and developer experience are complete.
+- [x] Frontend tests and build pass.
 - [ ] Two-browser authority/citizen flow passes.

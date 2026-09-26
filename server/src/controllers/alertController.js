@@ -6,7 +6,16 @@ import { ApiError } from "../middleware/errorHandler.js";
 
 export async function createAlert(req, res, next) {
   try {
-    const { type, severity, affectedArea, officialMessage, simplified, translations, visualInstructions, expiresAt } = req.body;
+    const {
+      type,
+      severity,
+      affectedArea,
+      officialMessage,
+      simplified,
+      translations,
+      visualInstructions,
+      expiresAt,
+    } = req.body;
 
     const alert = alertModel.create({
       type,
@@ -62,7 +71,7 @@ export async function processAlert(req, res, next) {
       existing.officialMessage,
       existing.type,
       existing.severity,
-      existing.affectedArea
+      existing.affectedArea,
     );
 
     const updated = alertModel.updateGeneratedContent(id, {
@@ -84,9 +93,12 @@ export async function sendAlert(req, res, next) {
     if (!existing) {
       throw new ApiError("ALERT_NOT_FOUND", "Alert was not found", 404);
     }
+    if (Date.parse(existing.expiresAt) <= Date.now()) {
+      throw new ApiError("ALERT_EXPIRED", "Expired alerts cannot be sent", 400);
+    }
 
     const updated = alertModel.updateStatus(id, "active");
-    
+
     // Emit realtime alert:sent and alert:received events after state is persisted
     socketService.emitAlertSent(updated);
 

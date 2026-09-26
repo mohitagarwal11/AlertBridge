@@ -60,6 +60,6 @@ export const seedAlerts = [
     ],
     status: "active",
     createdAt: "2026-01-01T12:00:00.000Z",
-    expiresAt: "2026-01-02T12:00:00.000Z",
+    expiresAt: "2026-12-31T12:00:00.000Z",
   },
 ];

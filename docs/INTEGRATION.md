@@ -2,6 +2,22 @@
 
 This guide covers the next phase after the independent frontend and backend branches: replacing frontend mock state with the live backend contract.
 
+## Current Integration Status
+
+The client and server API-first lifecycle is now implemented:
+
+- Citizen alert loading, view tracking, and acknowledgement use the HTTP API.
+- Authority create, process, send, history, and statistics use the HTTP API.
+- Frontend realtime handlers merge server events and filter authority events by `alertId`.
+- Backend validation rejects invalid languages, invalid expiry values, and expired sends.
+- Frontend tests, backend tests, and the frontend production build pass.
+
+Still pending:
+
+- Two-browser manual verification against a running server.
+- A future `alert:expired` event contract and scheduler, if required.
+- Production persistence, authentication, and security hardening.
+
 ## Local Environment
 
 ### Backend
@@ -37,14 +53,10 @@ Open `http://localhost:5173`. Check backend health at `http://localhost:3000/hea
 
 ## Integration Order
 
-1. Add `viewAlert` and `acknowledgeAlert` methods to the frontend API service.
-2. Add response adapters for `{ data: alerts }` and backend statistics fields such as `totalRecipients`.
-3. Replace citizen demo alert loading with `GET /api/alerts` and `GET /api/alerts/:id`.
-4. Replace citizen local acknowledgement timers with `POST /view` followed by `POST /acknowledge`.
-5. Replace authority local create/process/send state with the matching API endpoints.
-6. Load authority statistics from `GET /statistics` after send and after realtime updates.
-7. Keep Socket.IO event handlers focused on refreshing or merging persisted server state.
-8. Preserve the existing mock adapter as a fallback for offline UI development.
+1. Run the two-browser verification against a clean backend start.
+2. Keep Socket.IO event handlers focused on refreshing or merging persisted server state.
+3. Preserve the existing mock adapter as a fallback for offline UI development.
+4. Plan production persistence, authentication, and security hardening separately from MVP integration.
 
 ## Workstream Independence
 

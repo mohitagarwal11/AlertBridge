@@ -51,38 +51,38 @@ Complete the backend work in this order. B1-B4 are required for the next client 
 
 ### B1: Contract and API Readiness
 
-- [ ] Verify every route in [docs/CONTRACT.md](docs/CONTRACT.md) has an API test.
-- [ ] Verify create responses always match the shared alert shape.
-- [ ] Verify list responses consistently use `{ data: alerts }`.
-- [ ] Verify statistics consistently use `totalRecipients`, `delivered`, `viewed`, `acknowledged`, and `acknowledgementRate`.
-- [ ] Verify all failure paths use the shared `{ error: { code, message } }` shape.
-- [ ] Add request validation for type, severity, affected area, languages, and expiry.
+- [x] Verify every route in [docs/CONTRACT.md](docs/CONTRACT.md) has an API test.
+- [x] Verify create responses always match the shared alert shape.
+- [x] Verify list responses consistently use `{ data: alerts }`.
+- [x] Verify statistics consistently use `totalRecipients`, `delivered`, `viewed`, `acknowledged`, and `acknowledgementRate`.
+- [x] Verify all failure paths use the shared `{ error: { code, message } }` shape.
+- [x] Add request validation for type, severity, affected area, languages, and expiry.
 
 ### B2: Lifecycle and Persistence Guarantees
 
-- [ ] Confirm view and acknowledgement endpoints are idempotent for repeated requests.
-- [ ] Confirm backward recipient status transitions are rejected.
-- [ ] Validate that send cannot operate on an invalid or expired alert.
-- [ ] Define expiration behavior and emit `alert:expired` only after the contract is updated.
-- [ ] Keep `officialMessage` immutable through create, process, send, and update paths.
-- [ ] Document the in-memory reset behavior until persistent storage is introduced.
+- [x] Confirm view and acknowledgement endpoints are idempotent for repeated requests.
+- [x] Confirm backward recipient status transitions are rejected.
+- [x] Validate that send cannot operate on an invalid or expired alert.
+- [ ] Define and emit `alert:expired` after the contract is updated; expired sends are already rejected.
+- [x] Keep `officialMessage` immutable through create, process, send, and update paths.
+- [x] Document the in-memory reset behavior until persistent storage is introduced.
 
 ### B3: Client Integration Support
 
-- [ ] Provide stable seeded alert data for the two-browser integration flow.
-- [ ] Ensure `POST /view` and `POST /acknowledge` return the persisted recipient record.
-- [ ] Ensure statistics emitted in Socket.IO payloads match the HTTP statistics response.
-- [ ] Emit realtime events only after the corresponding model state is updated.
-- [ ] Handle disconnected sockets without affecting HTTP persistence.
-- [ ] Provide reproducible local environment values through `server/.env.example`.
+- [x] Provide stable seeded alert data for the two-browser integration flow.
+- [x] Ensure `POST /view` and `POST /acknowledge` return the persisted recipient record.
+- [x] Ensure statistics emitted in Socket.IO payloads match the HTTP statistics response.
+- [x] Emit realtime events only after the corresponding model state is updated.
+- [x] Handle disconnected sockets without affecting HTTP persistence.
+- [x] Provide reproducible local environment values through `server/.env.example`.
 
 ### B4: Backend Verification
 
-- [ ] Add API tests for every documented endpoint and error condition.
-- [ ] Add persistence tests for create, update, status transitions, and statistics.
-- [ ] Add Socket.IO tests for sent, received, viewed, acknowledged, and disconnect behavior.
-- [ ] Add a clean-start seeded demo test.
-- [ ] Run `npm run test` before every backend pull request.
+- [x] Add API tests for every documented endpoint and error condition.
+- [x] Add persistence tests for create, update, status transitions, and statistics.
+- [x] Add Socket.IO tests for sent, received, viewed, acknowledged, and disconnect behavior.
+- [x] Add a clean-start seeded demo test.
+- [x] Run `npm run test` before every backend pull request.
 
 ### B5: Production Hardening
 
@@ -121,8 +121,8 @@ Person B can finish B1, B2, and B4 independently. Coordinate B3 with Person A be
 
 Before merging client integration:
 
-- [ ] B1 contract and API readiness is complete.
-- [ ] B2 lifecycle and persistence guarantees are complete.
-- [ ] B3 client integration support is complete.
-- [ ] B4 backend verification is complete.
+- [x] B1 contract and API readiness is complete.
+- [x] B2 lifecycle and persistence guarantees are complete except the future `alert:expired` event.
+- [x] B3 client integration support is complete.
+- [x] B4 backend verification is complete.
 - [ ] Client integration has been verified in two browser sessions.
