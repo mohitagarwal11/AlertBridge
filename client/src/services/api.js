@@ -21,6 +21,16 @@ async function request(path, options = {}) {
 export const api = {
   listAlerts: () => request("/api/alerts"),
   getAlert: (alertId) => request(`/api/alerts/${alertId}`),
+  createAlert: (alert) =>
+    request("/api/alerts", {
+      method: "POST",
+      body: JSON.stringify(alert),
+    }),
+  processAlert: (alertId) =>
+    request(`/api/alerts/${alertId}/process`, { method: "POST" }),
+  sendAlert: (alertId) =>
+    request(`/api/alerts/${alertId}/send`, { method: "POST" }),
+  getStatistics: (alertId) => request(`/api/alerts/${alertId}/statistics`),
 };
 
 export { apiUrl };
