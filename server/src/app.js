@@ -1,7 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { config } from "./config.js";
-import { errorHandler } from "./middleware/errorHandler.js";
+import { errorHandler, ApiError } from "./middleware/errorHandler.js";
 import alertRoutes from "./routes/alertRoutes.js";
 
 export function createApp(configureRoutes) {
@@ -23,6 +23,11 @@ export function createApp(configureRoutes) {
   if (typeof configureRoutes === "function") {
     configureRoutes(app);
   }
+
+  // Catch unmatched routes (404)
+  app.use((_req, _res, next) => {
+    next(new ApiError("NOT_FOUND", "Route not found", 404));
+  });
 
   // Centralized error middleware attached AFTER all routes
   app.use(errorHandler);
