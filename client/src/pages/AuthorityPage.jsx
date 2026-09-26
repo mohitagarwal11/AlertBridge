@@ -58,6 +58,8 @@ export default function AuthorityPage() {
   const [sendState, setSendState] = useState("idle");
   const [isProcessing, setIsProcessing] = useState(false);
   const [liveError, setLiveError] = useState("");
+  const [isLivePreview, setIsLivePreview] = useState(true);
+  const [isLiveStatistics, setIsLiveStatistics] = useState(false);
   const [statistics, setStatistics] = useState(initialStatistics);
   const [history, setHistory] = useState(demoAlerts);
 
@@ -79,6 +81,7 @@ export default function AuthorityPage() {
     api
       .getStatistics(alertId)
       .then((nextStatistics) => {
+        setIsLiveStatistics(true);
         setStatistics((current) => ({ ...current, ...nextStatistics }));
       })
       .catch(() => {
@@ -152,6 +155,7 @@ export default function AuthorityPage() {
       setProcessedAlert(processed);
       setAlertStatus("processed");
       setSendState("idle");
+      setIsLivePreview(true);
     } catch {
       const generated = createGeneratedContent(form);
       setProcessedAlert({
@@ -166,6 +170,7 @@ export default function AuthorityPage() {
       });
       setAlertStatus("processed");
       setSendState("idle");
+      setIsLivePreview(false);
       setLiveError("Backend unavailable. Showing a local preview.");
     } finally {
       setIsProcessing(false);
@@ -173,7 +178,7 @@ export default function AuthorityPage() {
   }
 
   function sendAlert() {
-    if (!processedAlert || alertStatus === "sent") return;
+    if (!processedAlert || alertStatus === "sent" || !isLivePreview) return;
     setSendState("confirming");
   }
 
@@ -190,6 +195,7 @@ export default function AuthorityPage() {
         ...current.filter((alert) => alert.id !== sentAlert.id),
       ]);
       const nextStatistics = await api.getStatistics(sentAlert.id);
+      setIsLiveStatistics(true);
       setStatistics((current) => ({ ...current, ...nextStatistics }));
     } catch {
       setSendState("error");
@@ -198,7 +204,7 @@ export default function AuthorityPage() {
   }
 
   return (
-    <main className="authority-page page-container">
+    <main className="authority-page page-container" id="main-content">
       <div className="page-intro authority-intro">
         <div className="page-heading-row">
           <span className="section-kicker">Authority view</span>
@@ -215,6 +221,9 @@ export default function AuthorityPage() {
         <div>
           <span className="state-kicker">Live overview</span>
           <h2>Current delivery</h2>
+          <span className="simulation-label">
+            {isLiveStatistics ? "Live server statistics" : "Demo statistics"}
+          </span>
         </div>
         <div className="stats-grid">
           <div className="stat-card">
@@ -378,6 +387,10 @@ export default function AuthorityPage() {
               </div>
               <div className="generated-preview">
                 <span className="preview-label">Generated representation</span>
+                <p className="generated-review-warning">
+                  Demo-generated representation. Authority review required
+                  before sending.
+                </p>
                 <h3>{processedAlert.simplified.title}</h3>
                 <p>{processedAlert.simplified.summary}</p>
                 <ul className="preview-actions">
@@ -420,7 +433,11 @@ export default function AuthorityPage() {
               )}
               <button
                 className="send-button"
-                disabled={alertStatus === "sent" || sendState === "sending"}
+                disabled={
+                  alertStatus === "sent" ||
+                  sendState === "sending" ||
+                  !isLivePreview
+                }
                 onClick={sendAlert}
                 type="button"
               >
@@ -428,9 +445,11 @@ export default function AuthorityPage() {
                   ? "Sending alert..."
                   : alertStatus === "sent"
                     ? "Alert sent"
-                    : sendState === "error"
-                      ? "Retry send"
-                      : "Send alert"}
+                    : !isLivePreview
+                      ? "Preview only"
+                      : sendState === "error"
+                        ? "Retry send"
+                        : "Send alert"}
               </button>
             </>
           )}

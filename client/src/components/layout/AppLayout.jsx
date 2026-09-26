@@ -8,6 +8,9 @@ const navigation = [
 export default function AppLayout() {
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <header className="site-header">
         <NavLink className="brand" to="/">
           <span className="brand-mark" aria-hidden="true">

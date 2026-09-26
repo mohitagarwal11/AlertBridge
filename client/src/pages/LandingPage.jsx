@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
-    <main className="landing-page">
+    <main className="landing-page" id="main-content">
       <section className="landing-copy">
         <span className="section-kicker">
           Emergency communication, made clear

@@ -24,6 +24,7 @@ describe("CitizenPage", () => {
     speechSynthesis = {
       speak: vi.fn(),
       cancel: vi.fn(),
+      getVoices: vi.fn().mockReturnValue([{ lang: "hi-IN" }]),
     };
     Object.defineProperty(window, "speechSynthesis", {
       configurable: true,
@@ -41,7 +42,7 @@ describe("CitizenPage", () => {
       screen.getByText(/Due to the severe cyclonic storm/),
     ).toBeInTheDocument();
     expect(screen.getByText("Live updates connected")).toBeInTheDocument();
-    expect(api.listAlerts).toHaveBeenCalledTimes(1);
+    expect(api.listAlerts).toHaveBeenCalledWith("active");
     expect(api.viewAlert).toHaveBeenCalledWith("ALR-001", "USR-CITIZEN");
   });
 
@@ -58,6 +59,12 @@ describe("CitizenPage", () => {
     expect(
       screen.getByText("तुरंत सुरक्षित स्थान पर जाएं।"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "अलर्ट सुनें" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "मैंने अलर्ट समझ लिया" }),
+    ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe("hi");
   });
 
@@ -72,6 +79,24 @@ describe("CitizenPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Stop listening" }));
     expect(speechSynthesis.cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses an available fallback voice when an Odia voice is unavailable", () => {
+    render(<CitizenPage />);
+
+    fireEvent.change(screen.getByLabelText("Language"), {
+      target: { value: "or" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "ଆଲର୍ଟ ଶୁଣନ୍ତୁ" }));
+
+    const utterance = speechSynthesis.speak.mock.calls[0][0];
+    expect(utterance.lang).toBe("hi-IN");
+    expect(utterance.text).toContain("Baatyaa aasuchhi");
+    expect(
+      screen.getByText(
+        "No Odia voice is installed; using an audio-compatible fallback.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("persists an acknowledgement and disables duplicate acknowledgement", async () => {
@@ -90,6 +115,26 @@ describe("CitizenPage", () => {
     ).toHaveLength(1);
     expect(screen.getByText(/Acknowledged/)).toBeInTheDocument();
     expect(api.acknowledgeAlert).toHaveBeenCalledWith("ALR-001", "USR-CITIZEN");
+  });
+
+  it("shows a retryable acknowledgement state when the API fails", async () => {
+    api.acknowledgeAlert.mockRejectedValueOnce(new Error("offline"));
+    render(<CitizenPage />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole("button", { name: "I understand this alert" }),
+      );
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Try acknowledgement again" }),
+    ).toBeEnabled();
+    expect(
+      screen.getByText(
+        "We could not save your acknowledgement on this device.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("applies accessibility settings to the page", () => {

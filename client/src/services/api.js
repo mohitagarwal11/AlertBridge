@@ -30,7 +30,14 @@ export function normalizeStatistics(response) {
 }
 
 export const api = {
-  listAlerts: async () => normalizeAlertList(await request("/api/alerts")),
+  listAlerts: async (status) =>
+    normalizeAlertList(
+      await request(
+        status
+          ? `/api/alerts?status=${encodeURIComponent(status)}`
+          : "/api/alerts",
+      ),
+    ),
   getAlert: (alertId) => request(`/api/alerts/${alertId}`),
   createAlert: (alert) =>
     request("/api/alerts", {

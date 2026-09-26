@@ -20,6 +20,28 @@ summary {
   font: inherit;
 }
 
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 0.2rem solid #ba321f;
+  outline-offset: 0.2rem;
+}
+
+.sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .app-shell {
   width: min(100% - 2rem, 52rem);
   margin: 0 auto;
@@ -98,6 +120,24 @@ h1 {
   max-width: 32rem;
 }
 
+.section-label {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 2rem 0 0.8rem;
+  text-transform: uppercase;
+}
+
+.citizen-alert > .section-label {
+  margin-top: 2rem;
+}
+
+.action-section .section-label {
+  margin-top: 0;
+}
+
 .actions {
   display: grid;
   gap: 0.7rem;
@@ -107,8 +147,26 @@ h1 {
 }
 
 .actions li {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.7rem;
   border-left: 0.25rem solid #d49b2d;
   padding: 0.7rem 1rem;
+}
+
+.action-number {
+  align-items: center;
+  background: #d49b2d;
+  border-radius: 50%;
+  color: #19231f;
+  display: inline-flex;
+  flex: 0 0 1.4rem;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  height: 1.4rem;
+  justify-content: center;
+  width: 1.4rem;
 }
 
 .acknowledge-button {
@@ -159,6 +217,20 @@ h1 {
   min-height: 100vh;
   background:
     linear-gradient(135deg, rgba(217, 226, 214, 0.55), transparent 35%), #f1eee7;
+}
+
+.skip-link {
+  background: #19231f;
+  color: #fffdf8;
+  left: 1rem;
+  padding: 0.7rem 1rem;
+  position: absolute;
+  top: -5rem;
+  z-index: 10;
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 .site-header,
@@ -494,14 +566,22 @@ h1 {
 }
 
 .secondary-control {
+  align-items: center;
   background: transparent;
   border: 1px solid #1f5a46;
   border-radius: 0.2rem;
   color: #1f5a46;
   cursor: pointer;
+  display: inline-flex;
   font-family: Arial, sans-serif;
   font-weight: 700;
+  gap: 0.55rem;
   padding: 1rem 1.2rem;
+}
+
+.speaker-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .secondary-control:hover {
@@ -518,6 +598,13 @@ h1 {
   font-family: Arial, sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
+  margin: 0.8rem 0 0;
+}
+
+.speech-notice {
+  color: #54645c;
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
   margin: 0.8rem 0 0;
 }
 
@@ -654,6 +741,17 @@ h1 {
   font-size: clamp(1.7rem, 4vw, 2.6rem);
   line-height: 1;
   margin: 0.7rem 0 0;
+}
+
+.simulation-label {
+  color: #ba321f;
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-top: 0.7rem;
+  text-transform: uppercase;
 }
 
 .stats-grid {
@@ -859,6 +957,17 @@ h1 {
   font-size: 1.8rem;
   line-height: 0.95;
   margin: 1rem 0 0;
+}
+
+.generated-review-warning {
+  background: #fff4df;
+  border-left: 0.2rem solid #d49b2d;
+  color: #6a5120;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  padding: 0.55rem 0.7rem;
 }
 
 .preview-actions {

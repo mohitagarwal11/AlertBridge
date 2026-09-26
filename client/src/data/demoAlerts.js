@@ -47,6 +47,8 @@ export const demoAlert = {
       ],
       officialLabel: "ସରକାରୀ ବାର୍ତ୍ତା",
       listenLabel: "ଆଲର୍ଟ ଶୁଣନ୍ତୁ",
+      speechFallback:
+        "Baatyaa aasuchhi. Turanta eka surakshita sthaanaku yaaantu. Nimna anchala chhadantu. Surakshita aashrayaku yaaantu. Samudra thaaru dure ruhantu.",
     },
   },
   visualInstructions: [

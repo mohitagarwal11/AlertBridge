@@ -74,6 +74,24 @@ describe("frontend API service", () => {
     });
   });
 
+  it("supports filtering alerts by status", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ data: [] }), { status: 200 }),
+        ),
+    );
+
+    await api.listAlerts("active");
+
+    expect(fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/api/alerts?status=active",
+      expect.any(Object),
+    );
+  });
+
   it("normalizes shared API errors", async () => {
     vi.stubGlobal(
       "fetch",

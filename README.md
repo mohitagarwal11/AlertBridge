@@ -21,7 +21,7 @@ AlertBridge preserves an official emergency message while presenting clearer, tr
 
 ### Not Yet Production-Ready
 
-- Frontend workflows still use mock/local state in places; API integration is the next implementation phase.
+- Frontend API integration is implemented, with demo fallback for offline/low-connectivity use.
 - Server data is stored in memory and resets on restart.
 - Authentication, authorization, signed alerts, audit logs, and rate limiting are not implemented.
 - PostgreSQL, external AI providers, SMS, push, cell broadcast, and IoT delivery are roadmap items.
@@ -99,13 +99,7 @@ npm run test:client
 
 ## Next Step
 
-The next engineering phase is client/server integration:
-
-1. Add frontend API methods for view and acknowledgement.
-2. Replace authority mock lifecycle state with API calls.
-3. Replace citizen acknowledgement timers with server persistence.
-4. Adapt backend response shapes in the frontend service boundary.
-5. Verify the complete two-browser realtime flow.
+Before presenting, run the two-browser authority/citizen verification. After the MVP demo, prioritize persistent storage, authentication, production security, and a formal expiration event.
 
 See [docs/INTEGRATION.md](docs/INTEGRATION.md) for the sequence and [docs/CONTRACT.md](docs/CONTRACT.md) for the shared contract.
 
