@@ -80,14 +80,14 @@ alert:acknowledged
 
 ### 2. Citizen workflow
 
-- [ ] Build the active alert screen.
-- [ ] Show severity, title, summary, affected area, actions, visual instructions, and expiry.
-- [ ] Show the official message in a separate, clearly labelled section.
-- [ ] Add language selection using `translations`.
-- [ ] Add browser text-to-speech playback and stop controls.
-- [ ] Add large-text, high-contrast, reduced-motion, and low-connectivity settings.
-- [ ] Add acknowledgement states: available, submitting, acknowledged, and failed.
-- [ ] Add citizen alert history.
+- [x] Build the active alert screen.
+- [x] Show severity, title, summary, affected area, actions, visual instructions, and expiry.
+- [x] Show the official message in a separate, clearly labelled section.
+- [x] Add language selection using `translations`.
+- [x] Add browser text-to-speech playback and stop controls.
+- [x] Add large-text, high-contrast, reduced-motion, and low-connectivity settings.
+- [x] Add acknowledgement states: available, submitting, acknowledged, and failed.
+- [x] Add citizen alert history.
 
 ### 3. Authority workflow
 
@@ -107,11 +107,11 @@ alert:acknowledged
 
 ## Frontend Acceptance Criteria
 
-- [ ] All primary screens work with mock data before backend integration.
+- [x] All primary screens work with mock data before backend integration.
 - [ ] Replacing the mock adapter with the API client does not change component contracts.
-- [ ] Official text cannot be overwritten by generated content in the UI.
-- [ ] The acknowledgement action is idempotent from the user's perspective.
-- [ ] The interface works on mobile width and with accessibility settings enabled.
+- [x] Official text cannot be overwritten by generated content in the UI.
+- [x] The acknowledgement action is idempotent from the user's perspective.
+- [x] The interface works on mobile width and with accessibility settings enabled.
 - [ ] Tests cover alert rendering, language switching, text-to-speech controls, and acknowledgement behavior.
 - [ ] No frontend task requires a change to backend implementation files.
 
